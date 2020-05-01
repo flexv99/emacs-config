@@ -12,40 +12,35 @@
 ;; Felix Valentini
 ;; Emcas configuration v.2
 ;; last update 26.03.2020
-;;
-;; First set up connection to melpa (35-36) and then install use-package,
-;; after that you will be able to load the config-file
 ;; 
 ;; add MELPA to repo list
 ;;; Code:
-(setq inhibit-startup-screen t)
+;; start package.el with Emacs
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+;; package.el initialize
+(package-initialize)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package))))
+    (emms yasnippet auto-complete zones which-key use-package try spaceline smartparens python-mode org-pdfview org-gcal org-bullets nyan-mode neotree macrostep latex-extra keyfreq jedi highlight-numbers helm-core haskell-mode ggtags flycheck-irony elpy dracula-theme default-text-scale counsel-spotify counsel-gtags beacon babel auto-yasnippet auto-complete-c-headers auctex-latexmk ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
-;; start package.el with Emacs
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-;; package.el initialize
-(package-initialize)
 ;; Disable tool-bar
 (tool-bar-mode -1)
 ;; Key bindings for copy paste
 (cua-mode t)
     (setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-(transient-mark-mode 1) ;; No region when it is not highlighted
-;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
-(setq-default indent-tabs-mode nil)
+    (transient-mark-mode 1) ;; No region when it is not highlighted
 ;; shows bindings options
 (use-package which-key
   :ensure t
@@ -56,48 +51,28 @@
   ;; start autocomplete with emacs
   :config
   (require 'auto-complete))
-(use-package auto-complete-c-headers
-  :ensure t)
 ;; do default config for auto-complete
 (require 'auto-complete-config)
 (ac-config-default)
 ;;yasnippet for emacs
 (use-package yasnippet
   :ensure t
-  :init
+  :config
+  (require 'yasnippet)
   (yas-global-mode 1))
-(use-package yasnippet-snippets
-  :ensure t)
 ;; function which initializes auto-complete-c-headers and gets called for c/c++ hook
 (defun my:ac-c-header-init()
   (require 'auto-complete-c-headers)
-  (add-to-list 'ac-sources 'ac-source-c-headers))
+  (add-to-list 'ac-sources 'ac-source-c-headers)
+  (add-to-list 'ac-head:include-directories '"/usr/lib/gcc/x86_64-linux-gnu/7/include"))
 ;; to call this funtion from c/c++ hooks
 (add-hook 'c++-mode-hook 'my:ac-c-header-init)
 (add-hook 'c-mode-hook 'my:ac-c-header-init)
-;; ggtags to find out where the dependecies of a function or class are store and to easily open them
-;; REQUIRES the package GLOBAL (apt on debian)
-(use-package ggtags
-  :ensure t
-  :config
-  (add-hook 'C-mode-common-hook
-	    (lambda ()
-	      (when (derived-mode-p 'c-mode 'c++-mode)
-		(ggtags-mode 1)))))
 ;; debugger
 (use-package flycheck
   :ensure t
   :init
   (global-flycheck-mode t))
-;; modes
-;; haskell integration
-(use-package haskell-mode
-  :ensure t
-  :config
-  (require 'haskell-mode))
-;; nix-mode to write nix-expressions
-(use-package nix-mode
-  :ensure t)
 ;; iserch with shown result
 (use-package counsel
   :ensure t)
@@ -170,27 +145,25 @@
   :config
   (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 
-;;functionality
 (use-package smartparens
   :hook (prog-mode . smartparens-mode)
   :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t))
-;; shows directories
+  (require 'smartparens-config))
+
 (use-package neotree
   :ensure t
   :config
   (require 'neotree)
   (global-set-key [f8] 'neotree-toggle))
-;; emacs multimedia system
-(use-package emms
-  :ensure t)
 
-;; org-mode stuff
-(use-package org-bullets
+(use-package emms
   :ensure t
   :config
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (require 'emms-player-mplayer)
+  (emms-standard)
+  (emms-default-players)
+  (define-emms-simple-player mplayer '(file url)
+    (regexp-opt '(".ogg" ".mp3" ".wav" ".mpeg" ".flac"))
+    "mplayer" "-slave" "-quiet" "-relly-quiet" "-fullscreen"))
 
 ;;; .emacs ends here

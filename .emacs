@@ -12,35 +12,40 @@
 ;; Felix Valentini
 ;; Emcas configuration v.2
 ;; last update 26.03.2020
+;;
+;; First set up connection to melpa (35-36) and then install use-package,
+;; after that you will be able to load the config-file
 ;; 
 ;; add MELPA to repo list
 ;;; Code:
-;; start package.el with Emacs
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-;; package.el initialize
-(package-initialize)
+(setq inhibit-startup-screen t)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (emms yasnippet auto-complete zones which-key use-package try spaceline smartparens python-mode org-pdfview org-gcal org-bullets nyan-mode neotree macrostep latex-extra keyfreq jedi highlight-numbers helm-core haskell-mode ggtags flycheck-irony elpy dracula-theme default-text-scale counsel-spotify counsel-gtags beacon babel auto-yasnippet auto-complete-c-headers auctex-latexmk ace-window))))
+    (pylint jedi org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+;; start package.el with Emacs
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+;; package.el initialize
+(package-initialize)
 ;; Disable tool-bar
 (tool-bar-mode -1)
 ;; Key bindings for copy paste
 (cua-mode t)
     (setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
-    (transient-mark-mode 1) ;; No region when it is not highlighted
+(transient-mark-mode 1) ;; No region when it is not highlighted
+;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
+(setq-default indent-tabs-mode nil)
 ;; shows bindings options
 (use-package which-key
   :ensure t
@@ -50,29 +55,57 @@
   :ensure t
   ;; start autocomplete with emacs
   :config
-  (require 'auto-complete))
+  (require 'auto-complete)) ;;a-c mode 4 org-mode
+(use-package auto-complete-c-headers
+  :ensure t)
 ;; do default config for auto-complete
 (require 'auto-complete-config)
 (ac-config-default)
 ;;yasnippet for emacs
 (use-package yasnippet
   :ensure t
-  :config
-  (require 'yasnippet)
+  :init
   (yas-global-mode 1))
+(use-package yasnippet-snippets
+  :ensure t)
 ;; function which initializes auto-complete-c-headers and gets called for c/c++ hook
 (defun my:ac-c-header-init()
   (require 'auto-complete-c-headers)
-  (add-to-list 'ac-sources 'ac-source-c-headers)
-  (add-to-list 'ac-head:include-directories '"/usr/lib/gcc/x86_64-linux-gnu/7/include"))
+  (add-to-list 'ac-sources 'ac-source-c-headers))
 ;; to call this funtion from c/c++ hooks
 (add-hook 'c++-mode-hook 'my:ac-c-header-init)
 (add-hook 'c-mode-hook 'my:ac-c-header-init)
+;; ggtags to find out where the dependecies of a function or class are store and to easily open them
+;; REQUIRES the package GLOBAL (apt on debian)
+(use-package ggtags
+  :ensure t
+  :config
+  (add-hook 'C-mode-common-hook
+	    (lambda ()
+	      (when (derived-mode-p 'c-mode 'c++-mode)
+		(ggtags-mode 1)))))
 ;; debugger
 (use-package flycheck
   :ensure t
   :init
   (global-flycheck-mode t))
+;; modes
+;; python
+(setq python-shell-interpreter "python3") ;; sets python3 as default interpreter
+;; jedi ac for python
+(use-package jedi
+  :ensure t
+  :init
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook 'jedi:ac-setup))
+;; haskell integration
+(use-package haskell-mode
+  :ensure t
+  :config
+  (require 'haskell-mode))
+;; nix-mode to write nix-expressions
+(use-package nix-mode
+  :ensure t)
 ;; iserch with shown result
 (use-package counsel
   :ensure t)
@@ -145,25 +178,126 @@
   :config
   (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 
+;;functionality
 (use-package smartparens
   :hook (prog-mode . smartparens-mode)
   :config
-  (require 'smartparens-config))
-
+  (smartparens-global-mode t)
+  (show-smartparens-global-mode t))
+;; shows directories
 (use-package neotree
   :ensure t
   :config
   (require 'neotree)
   (global-set-key [f8] 'neotree-toggle))
-
+;; emacs multimedia system
 (use-package emms
+  :ensure t)
+
+;; org-mode stuff
+(use-package org-bullets
   :ensure t
   :config
-  (require 'emms-player-mplayer)
-  (emms-standard)
-  (emms-default-players)
-  (define-emms-simple-player mplayer '(file url)
-    (regexp-opt '(".ogg" ".mp3" ".wav" ".mpeg" ".flac"))
-    "mplayer" "-slave" "-quiet" "-relly-quiet" "-fullscreen"))
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+;;org-beamer for presentations
+;; allow for export=>beamer by placing
+
+;; #+LaTeX_CLASS: beamer in org files
+(unless (boundp 'org-export-latex-classes)
+  (setq org-export-latex-classes nil))
+(add-to-list 'org-export-latex-classes
+  ;; beamer class, for presentations
+             '("beamer"
+               "\\documentclass[11pt]{beamer}\n
+      \\mode<{{{beamermode}}}>\n
+      \\usetheme{{{{beamertheme}}}}\n
+      \\usecolortheme{{{{beamercolortheme}}}}\n
+      \\beamertemplateballitem\n
+      \\setbeameroption{show notes}
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{hyperref}\n
+      \\usepackage{color}
+      \\usepackage{listings}
+      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+  frame=single,
+  basicstyle=\\small,
+  showspaces=false,showstringspaces=false,
+  showtabs=false,
+  keywordstyle=\\color{blue}\\bfseries,
+  commentstyle=\\color{red},
+  }\(not )
+      \\usepackage{verbatim}\n
+      \\(insert )nstitute{{{{beamerinstitute}}}}\n
+       \\subject{{{{beamersubject}}}}\n"
+               
+               ("\\section{%s}" . "\\section*{%s}")
+               
+               ("\\begin{frame}[fragile]\\frametitle{%s}"
+                "\\end{frame}"
+                "\\begin{frame}[fragile]\\frametitle{%s}"
+                "\\end{frame}")))
+
+;; letter class, for formal letters
+
+(add-to-list 'org-export-latex-classes
+             
+             '("letter"
+               "\\documentclass[11pt]{letter}\n
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\(not )
+      \\usepackage{color}"
+               
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+;;pdf-tools to open pdfs
+(use-package let-alist
+  :ensure t) ;; dependency
+(use-package tablist
+  :ensure t) ;; dependency
+(use-package pdf-tools
+    :ensure t
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+    (bind-keys :map pdf-view-mode-map
+        ("\\" . hydra-pdftools/body)
+        ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
+        ("g"  . pdf-view-first-page)
+        ("G"  . pdf-view-last-page)
+        ("l"  . image-forward-hscroll)
+        ("h"  . image-backward-hscroll)
+        ("j"  . pdf-view-next-page)
+        ("k"  . pdf-view-previous-page)
+        ("e"  . pdf-view-goto-page)
+        ("u"  . pdf-view-revert-buffer)
+        ("al" . pdf-annot-list-annotations)
+        ("ad" . pdf-annot-delete)
+        ("aa" . pdf-annot-attachment-dired)
+        ("am" . pdf-annot-add-markup-annotation)
+        ("at" . pdf-annot-add-text-annotation)
+        ("y"  . pdf-view-kill-ring-save)
+        ("i"  . pdf-misc-display-metadata)
+        ("s"  . pdf-occur)
+        ("b"  . pdf-view-set-slice-from-bounding-box)
+        ("r"  . pdf-view-reset-slice))
+     (use-package org-pdfview
+       :ensure t))
+
+;; org-epresent(KISS_presentation)
+(use-package epresent
+  :ensure t)
+(use-package org-download
+  :ensure t
+  :config
+  (require 'org-download)
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable))
 
 ;;; .emacs ends here

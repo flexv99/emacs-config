@@ -26,7 +26,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (pylint jedi org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package))))
+    (afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint jedi org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -35,7 +35,7 @@
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 ;; start package.el with Emacs
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; package.el initialize
 (package-initialize)
 ;; Disable tool-bar
@@ -50,7 +50,7 @@
 (use-package which-key
   :ensure t
   :config (which-key-mode))
-;; auto completion funktion for some languages
+;; auto completion funcion for some languages
 (use-package auto-complete
   :ensure t
   ;; start autocomplete with emacs
@@ -90,14 +90,32 @@
   :init
   (global-flycheck-mode t))
 ;; modes
-;; python
-(setq python-shell-interpreter "python3") ;; sets python3 as default interpreter
+;; TEMPORARY Python-DJANGO shell (DOLASILLA Project)
+(setq python-shell-interpreter "python"
+      python-shell-interpreter-args "-i /home/flex/work/02_dolasilla/dolasilla_seite/manage.py shell") ;; sets python3 as default interpreter
+;; to load virtualenv's in python-mode
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
 ;; jedi ac for python
 (use-package jedi
   :ensure t
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   (add-hook 'python-mode-hook 'jedi:ac-setup))
+;; htm-mode
+(add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.html$" . html-mode))
+;; python-django mode
+;; (add-to-list 'load-path "~/.emacs.d/elpa/python-django")
+;; (load "python-django")
+;; (require 'python-django)
+;; Hy Mode Python Lisp
+(add-to-list 'load-path "~/.emacs.d/elpa/hy-mode")
+(load "hy-mode")
+(add-to-list 'auto-mode-alist '("\\.hy\\'" . hy-mode))
 ;; haskell integration
 (use-package haskell-mode
   :ensure t
@@ -137,10 +155,14 @@
 
 ;; appearence
 ;; theme
-(use-package dracula-theme
+(use-package afternoon-theme
   :ensure t
   :config
-  (require 'dracula-theme))
+  (require 'afternoon-theme))
+;; (use-package dracula-theme
+;;   :ensure t
+;;   :config
+;;   (require 'dracula-theme))
 ;; Mod line configuration, used package: spaceline
 (use-package spaceline
   :ensure t
@@ -287,8 +309,7 @@
         ("s"  . pdf-occur)
         ("b"  . pdf-view-set-slice-from-bounding-box)
         ("r"  . pdf-view-reset-slice))
-     (use-package org-pdfview
-       :ensure t))
+    )
 
 ;; org-epresent(KISS_presentation)
 (use-package epresent

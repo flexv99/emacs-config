@@ -57,7 +57,10 @@
   :config
   (require 'auto-complete)) ;;a-c mode 4 org-mode
 ;; company especially for hy-lang
-(use-package company)
+(use-package company
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.hy\\'" . company)))
 ;;  el-doc
 (use-package irony-eldoc
   :ensure t
@@ -115,14 +118,6 @@
 (add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.html$" . html-mode))
-;; python-django mode
-;; (add-to-list 'load-path "~/.emacs.d/elpa/python-django")
-;; (load "python-django")
-;; (require 'python-django)
-;; Hy Mode Python Lisp
-;; (add-to-list 'load-path "~/.emacs.d/elpa/hy-mode")
-;; (load "hy-mode")
-;; (add-to-list 'auto-mode-alist '("\\.hy\\'" . hy-mode))
 (use-package hy-mode
   :ensure t
   :config

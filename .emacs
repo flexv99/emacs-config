@@ -24,9 +24,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("dcdd1471fde79899ae47152d090e3551b889edf4b46f00df36d653adc2bf550d" "57e3f215bef8784157991c4957965aa31bac935aca011b29d7d8e113a652b693" default))
  '(package-selected-packages
-   (quote
-    (irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint jedi org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package))))
+   '(all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -49,18 +50,14 @@
 ;; shows bindings options
 (use-package which-key
   :ensure t
-  :config (which-key-mode))
+  :config
+  (which-key-mode))
 ;; auto completion funcion for some languages
 (use-package auto-complete
   :ensure t
   ;; start autocomplete with emacs
   :config
   (require 'auto-complete)) ;;a-c mode 4 org-mode
-;; company especially for hy-lang
-(use-package company
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.hy\\'" . company)))
 ;;  el-doc
 (use-package irony-eldoc
   :ensure t
@@ -102,18 +99,18 @@
 ;; modes
 ;; TEMPORARY Python-DJANGO shell (DOLASILLA Project)
 (setq python-shell-interpreter "python"
-      python-shell-interpreter-args "-i /home/flex/work/02_dolasilla/dolasilla_seite/manage.py shell -i ipython") ;; sets python3 as default interpreter
+      python-shell-interpreter-args "-i /home/flex/work/02_dolasilla/dolasilla_seite/manage.py shell") ;; sets python3 as default interpreter
 ;; to load virtualenv's in python-mode
 (use-package elpy
   :ensure t
   :init
   (elpy-enable))
 ;; jedi ac for python
-(use-package jedi
-  :ensure t
-  :init
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook 'jedi:ac-setup))
+;; (use-package jedi
+;;   :ensure t
+;;   :init
+;;   (add-hook 'python-mode-hook 'jedi:setup)
+;;   (add-hook 'python-mode-hook 'jedi:ac-setup))
 ;; htm-mode
 (add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
@@ -121,7 +118,8 @@
 (use-package hy-mode
   :ensure t
   :config
-  (require 'hy-mode))
+  (require 'hy-mode)
+  :mode "//.hy//'")
 ;; haskell integration
 (use-package haskell-mode
   :ensure t
@@ -161,14 +159,29 @@
 
 ;; appearence
 ;; theme
-(use-package afternoon-theme
-  :ensure t
+(use-package doom-themes
   :config
-  (require 'afternoon-theme))
-;; (use-package dracula-theme
-;;   :ensure t
-;;   :config
-;;   (require 'dracula-theme))
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+  
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+(use-package all-the-icons
+  :ensure t)
+;; disable scroll-bar
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
 ;; Mod line configuration, used package: spaceline
 (use-package spaceline
   :ensure t
@@ -326,5 +339,8 @@
   (require 'org-download)
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable))
+
+(global-set-key (kbd "C-c c") 'comment-region)
+(global-set-key (kbd "C-c u") 'uncomment-region)
 
 ;;; .emacs ends here

@@ -1,4 +1,18 @@
-((("gbr" .
+((("getChargesTableParkingPutia" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0])
+  ("CorrispettiviParkingPutia" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 1])
+  ("getChargesTableBarBosch" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0])
+  ("CorrispettiviBarBosch" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0])
+  ("getChargesTableBoerzRist" .
+   [0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("CorrispettiviBoerzRist" .
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1])
+  ("getChargesTableBoerz" .
+   [0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("gbr" .
    [1 0 0])
   ("corrispettivi_boerz_rist" .
    [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0])
@@ -143,13 +157,13 @@
   ("meldungen" .
    [0 0 0 0 0 0 0 0 1])
   ("url" .
-   [5 0 1])
+   [9 0 1])
   ("urlpatterns" .
    [0 0 0 0 0 0 0 0 0 1 0])
   ("views" .
-   [7 0 0 0 0])
+   [10 0 0 0 2])
   ("urls" .
-   [3 0 0 1])
+   [4 0 0 1])
   ("conf" .
    [1 0 0 1])
   ("django" .
@@ -269,7 +283,7 @@
   ("pdf-tools" .
    [0 0 0 1 0 0 0 0 0])
   ("require" .
-   [3 0 0 0 0 0 1])
+   [4 0 0 0 0 0 1])
   ("number1" .
    [3 0 0 0 0 0 0])
   ("n" .
@@ -399,21 +413,21 @@
   ("HasMember" .
    [1 0 0 1 0 0 1 0 0])
   ("use-package" .
-   [2 0 0 0 0 0 0 0 0 0 0])
+   [2 0 0 0 0 0 0 0 0 0 2])
   ("pdf-view" .
    [0 0 0 0 1 0 0 0])
   (":ensure" .
-   [3 0 0 0 0 0 0])
+   [4 0 0 0 0 0 0])
   (":init" .
    [2 0 0 0 0])
   (":config" .
-   [3 0 0 0 1 0 0])
+   [4 0 0 0 1 0 0])
   ("spells_name" .
    [8 0 2 3 0 1 0 1 0 0 5])
   ("vector" .
    [3 0 0 1 1 0])
   ("name" .
-   [5 0 0 0])
+   [10 0 0 0])
   ("Spells" .
    [1 0 0 1 0 0])
   ("character" .
@@ -565,7 +579,7 @@
   ("reportForm" .
    [0 0 0 0 0 0 2 0 0 1])
   ("date" .
-   [23 0 0 0])
+   [24 0 0 0])
   ("is_valid" .
    [1 0 0 0 0 0 0 0])
   ("form" .
@@ -691,4 +705,42 @@
   ("continue" .
    [0 0 0 0 1 0 0 0])
   ("DatePickerInput" .
-   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0])))
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("uploadFileRistCsd" .
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("uploadFileBoerz" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 1])
+  ("saveToModelsBoerz" .
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("uploadFileBoerzRist" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0])
+  ("saveToModelsBoerzRist" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0])
+  ("uploadFileBarBosch" .
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("saveToModelsBarBosch" .
+   [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+  ("uploadFileParkingPutia" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0])
+  ("saveToModelsParkingPutia" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0])
+  ("spotipy" .
+   [1 0 0 0 0 0 0])
+  (":mode" .
+   [1 0 0 0 0])
+  ("company" .
+   [1 0 0 0 0 0 1])
+  ("global-set-key" .
+   [0 0 0 0 0 0 0 0 0 0 1 0 0 1])
+  ("kbd" .
+   [2 0 0])
+  ("comment-region" .
+   [0 0 0 0 0 0 0 0 0 0 1 0 0 0])
+  ("c" .
+   [1])
+  ("uncomment-region" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1])
+  ("getChargesTableCsdRist" .
+   [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1])
+  ("all-the-icons" .
+   [0 0 0 0 0 0 0 1 0 0 0 0 0])))

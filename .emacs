@@ -106,11 +106,11 @@
   :init
   (elpy-enable))
 ;; jedi ac for python
-;; (use-package jedi
-;;   :ensure t
-;;   :init
-;;   (add-hook 'python-mode-hook 'jedi:setup)
-;;   (add-hook 'python-mode-hook 'jedi:ac-setup))
+(use-package jedi
+  :ensure t
+  :init
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook 'jedi:ac-setup))
 ;; htm-mode
 (add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
@@ -120,6 +120,12 @@
   :config
   (require 'hy-mode)
   :mode "//.hy//'")
+(use-package company
+  :ensure t
+  :config
+  (setq initial-major-mode 'company))
+;; ac-hy
+(add-to-list 'ac-modes 'hy-mode)
 ;; haskell integration
 (use-package haskell-mode
   :ensure t
@@ -340,7 +346,8 @@
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable))
 
-(global-set-key (kbd "C-c c") 'comment-region)
-(global-set-key (kbd "C-c u") 'uncomment-region)
+(global-set-key (kbd "C-c") 'comment-region)
+(global-set-key (kbd "C-u") 'uncomment-region)
 
 ;;; .emacs ends here
+

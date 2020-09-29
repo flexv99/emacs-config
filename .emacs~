@@ -27,7 +27,7 @@
  '(custom-safe-themes
    '("dcdd1471fde79899ae47152d090e3551b889edf4b46f00df36d653adc2bf550d" "57e3f215bef8784157991c4957965aa31bac935aca011b29d7d8e113a652b693" default))
  '(package-selected-packages
-   '(all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
+   '(web-mode all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -115,6 +115,11 @@
 (add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.html$" . html-mode))
+(use-package web-mode
+  :ensure t
+  :config
+  (require 'web-mode)
+  (add-to-list 'auto-mode-alist '("\\.html$" . web-mode)))
 (use-package hy-mode
   :ensure t
   :config
@@ -124,6 +129,8 @@
   :ensure t
   :config
   (setq initial-major-mode 'company))
+;; ac-hy
+(add-to-list 'ac-modes 'hy-mode)
 ;; haskell integration
 (use-package haskell-mode
   :ensure t

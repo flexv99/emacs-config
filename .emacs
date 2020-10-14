@@ -106,11 +106,11 @@
   :init
   (elpy-enable))
 ;; jedi ac for python
-(use-package jedi
-  :ensure t
-  :init
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook 'jedi:ac-setup))
+;; (use-package jedi
+;;   :ensure t
+;;   :init
+;;   (add-hook 'python-mode-hook 'jedi:setup)
+;;   (add-hook 'python-mode-hook 'jedi:ac-setup))
 ;; htm-mode
 (add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))

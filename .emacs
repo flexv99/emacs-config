@@ -27,7 +27,7 @@
  '(custom-safe-themes
    '("dcdd1471fde79899ae47152d090e3551b889edf4b46f00df36d653adc2bf550d" "57e3f215bef8784157991c4957965aa31bac935aca011b29d7d8e113a652b693" default))
  '(package-selected-packages
-   '(web-mode all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
+   '(tide slime wsd-mode latex-math-preview latex-math-mode web-mode all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -125,6 +125,24 @@
   :config
   (require 'hy-mode)
   :mode "//.hy//'")
+;; jsx and typescript support
+(use-package tide
+  :ensure t
+  :config
+  (defun setup-tide-mode ()
+    "Setup function for tide."
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+
+  (setq company-tooltip-align-annotations t)
+
+  (add-hook 'js-mode-hook #'setup-tide-mode))
+
 (use-package company
   :ensure t
   :config
@@ -136,6 +154,11 @@
   :ensure t
   :config
   (require 'haskell-mode))
+;; slime common list interpreter
+(use-package slime
+  :ensure t
+  :config
+  (setq inferior-lisp-program "sbcl"))
 ;; nix-mode to write nix-expressions
 (use-package nix-mode
   :ensure t)
@@ -341,6 +364,10 @@
         ("r"  . pdf-view-reset-slice))
     )
 
+;; math-preview-latex
+(use-package latex-math-preview
+  :ensure t)
+
 ;; org-epresent(KISS_presentation)
 (use-package epresent
   :ensure t)
@@ -351,9 +378,11 @@
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable))
 
+(use-package wsd-mode
+  :ensure t)
+
 (global-set-key (kbd "C-c") 'comment-region)
 (global-set-key (kbd "C-u") 'uncomment-region)
 
 (find-file "/home/flex/my-todos/todos.org")
 ;;; .emacs ends here
-

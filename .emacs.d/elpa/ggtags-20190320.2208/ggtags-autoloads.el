@@ -9,10 +9,7 @@
 ;;;### (autoloads nil "ggtags" "ggtags.el" (0 0 0 0))
 ;;; Generated autoloads from ggtags.el
 
-(autoload 'ggtags-find-project "ggtags" "\
-
-
-\(fn)" nil nil)
+(autoload 'ggtags-find-project "ggtags" nil nil nil)
 
 (autoload 'ggtags-find-tag-dwim "ggtags" "\
 Find NAME by context.
@@ -27,17 +24,18 @@ definition tags.
 
 (autoload 'ggtags-mode "ggtags" "\
 Toggle Ggtags mode on or off.
-With a prefix argument ARG, enable Ggtags mode if ARG is
-positive, and disable it otherwise.  If called from Lisp, enable
-the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'.
+
+If called interactively, enable Ggtags mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
+
 \\{ggtags-mode-map}
 
 \(fn &optional ARG)" t nil)
 
 (autoload 'ggtags-build-imenu-index "ggtags" "\
-A function suitable for `imenu-create-index-function'.
-
-\(fn)" nil nil)
+A function suitable for `imenu-create-index-function'." nil nil)
 
 (autoload 'ggtags-try-complete-tag "ggtags" "\
 A function suitable for `hippie-expand-try-functions-list'.

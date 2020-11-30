@@ -11,157 +11,23 @@
 ;;;
 ;; Felix Valentini
 ;; Emcas configuration v.2
-;; last update 26.03.2020
-;;
-;; First set up connection to melpa (35-36) and then install use-package,
-;; after that you will be able to load the config-file
-;; 
-;; add MELPA to repo list
-;;; Code:
+;; last update 30.11.2020
+
 (setq inhibit-startup-screen t)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("dcdd1471fde79899ae47152d090e3551b889edf4b46f00df36d653adc2bf550d" "57e3f215bef8784157991c4957965aa31bac935aca011b29d7d8e113a652b693" default))
- '(package-selected-packages
-   '(slime wsd-mode latex-math-preview latex-math-mode web-mode all-the-icons doom-themes doom irony-eldoc company-mode ac-company afternoon-theme sanityinc-tomorrow-bright pyvenv hy-mode tablist pylint org-download epresent pdfview org-pdfview pdf-tools org-present nix-mode haskell-mode org-bullets emms ggtags auto-complete-c-headers yasnippet-snippets smartparens neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline dracula-theme counsel flycheck yasnippet auto-complete which-key use-package)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
-;; start package.el with Emacs
+;; start package.el eith Emacs
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; package.el initialize
+;; initialize package.el
 (package-initialize)
 ;; Disable tool-bar
 (tool-bar-mode -1)
-;; Key bindings for copy paste
+;; Copy paste setup
 (cua-mode t)
-    (setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+(setq cua-auto-tabify-rectangles nil)
+(transient-mark-mode 1)
 (transient-mark-mode 1) ;; No region when it is not highlighted
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
-(setq-default indent-tabs-mode nil)
-;; shows bindings options
-(use-package which-key
-  :ensure t
-  :config
-  (which-key-mode))
-;; auto completion funcion for some languages
-(use-package auto-complete
-  :ensure t
-  ;; start autocomplete with emacs
-  :config
-  (require 'auto-complete)) ;;a-c mode 4 org-mode
-;;  el-doc
-(use-package irony-eldoc
-  :ensure t
-  :config
-  (require 'irony-eldoc))
-(use-package auto-complete-c-headers
-  :ensure t)
-;; do default config for auto-complete
-(require 'auto-complete-config)
-(ac-config-default)
-;;yasnippet for emacs
-(use-package yasnippet
-  :ensure t
-  :init
-  (yas-global-mode 1))
-(use-package yasnippet-snippets
-  :ensure t)
-;; function which initializes auto-complete-c-headers and gets called for c/c++ hook
-(defun my:ac-c-header-init()
-  (require 'auto-complete-c-headers)
-  (add-to-list 'ac-sources 'ac-source-c-headers))
-;; to call this funtion from c/c++ hooks
-(add-hook 'c++-mode-hook 'my:ac-c-header-init)
-(add-hook 'c-mode-hook 'my:ac-c-header-init)
-;; ggtags to find out where the dependecies of a function or class are store and to easily open them
-;; REQUIRES the package GLOBAL (apt on debian)
-(use-package ggtags
-  :ensure t
-  :config
-  (add-hook 'C-mode-common-hook
-	    (lambda ()
-	      (when (derived-mode-p 'c-mode 'c++-mode)
-		(ggtags-mode 1)))))
-;; debugger
-(use-package flycheck
-  :ensure t
-  :init
-  (global-flycheck-mode t))
-;; modes
-;; TEMPORARY Python-DJANGO shell (DOLASILLA Project)
-(setq python-shell-interpreter "python"
-      python-shell-interpreter-args "-i /home/flex/work/02_dolasilla/dolasilla_seite/manage.py shell") ;; sets python3 as default interpreter
-;; to load virtualenv's in python-mode
-(use-package elpy
-  :ensure t
-  :init
-  (elpy-enable))
-;; jedi ac for python
-;; (use-package jedi
-;;   :ensure t
-;;   :init
-;;   (add-hook 'python-mode-hook 'jedi:setup)
-;;   (add-hook 'python-mode-hook 'jedi:ac-setup))
-;; htm-mode
-(add-to-list 'auto-mode-alist '("\\.css$" . html-mode))
-(add-to-list 'auto-mode-alist '("\\.cfm$" . html-mode))
-(add-to-list 'auto-mode-alist '("\\.html$" . html-mode))
-(use-package web-mode
-  :ensure t
-  :config
-  (require 'web-mode)
-  (add-to-list 'auto-mode-alist '("\\.html$" . web-mode)))
-(use-package hy-mode
-  :ensure t
-  :config
-  (require 'hy-mode)
-  :mode "//.hy//'")
-;; jsx and typescript support
-(use-package tide
-  :ensure t
-  :config
-  (defun setup-tide-mode ()
-    "Setup function for tide."
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-
-  (setq company-tooltip-align-annotations t)
-
-  (add-hook 'js-mode-hook #'setup-tide-mode))
-
-(use-package company
-  :ensure t
-  :config
-  (setq initial-major-mode 'company))
-;; ac-hy
-(add-to-list 'ac-modes 'hy-mode)
-;; haskell integration
-(use-package haskell-mode
-  :ensure t
-  :config
-  (require 'haskell-mode))
-;; slime common list interpreter
-(use-package slime
-  :ensure t
-  :config
-  (setq inferior-lisp-program "sbcl"))
-;; nix-mode to write nix-expressions
-(use-package nix-mode
-  :ensure t)
+;; Editor plug ins
 ;; iserch with shown result
 (use-package counsel
   :ensure t)
@@ -190,8 +56,6 @@
     (global-set-key (kbd "C-x l") 'counsel-locate)
     (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
     (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)))
-
-;; appearence
 ;; theme
 (use-package doom-themes
   :config
@@ -253,22 +117,114 @@
   :config
   (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 
-;;functionality
 (use-package smartparens
   :hook (prog-mode . smartparens-mode)
   :config
   (smartparens-global-mode t)
-  (show-smartparens-global-mode t))
+  (show-smartparens-global-mode t)
+  (require 'smartparens-config))
+
 ;; shows directories
 (use-package neotree
   :ensure t
   :config
   (require 'neotree)
   (global-set-key [f8] 'neotree-toggle))
-;; emacs multimedia system
-(use-package emms
+(setq-default indent-tabs-mode nil)
+
+;; shows bindings options
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+;; Programming plug-ins
+;; auto completion funcion for some languages
+(use-package auto-complete
+  :ensure t
+  ;; start autocomplete with emacs
+  :config
+  (require 'auto-complete)) ;;a-c mode 4 org-mode
+;; c-specific auto complete
+(use-package auto-complete-c-headers
+  :ensure t)
+;; function which initializes auto-complete-c-headers and gets called for c/c++ hook
+(defun my:ac-c-header-init()
+  (require 'auto-complete-c-headers)
+  (add-to-list 'ac-sources 'ac-source-c-headers))
+;; to call this funtion from c/c++ hooks
+(add-hook 'c++-mode-hook 'my:ac-c-header-init)
+(add-hook 'c-mode-hook 'my:ac-c-header-init)
+;; ggtags to find out where the dependecies of a function or class are store and to easily open them
+;; REQUIRES the package GLOBAL (apt on debian)
+(use-package ggtags
+  :ensure t
+  :config
+  (add-hook 'C-mode-common-hook
+	    (lambda ()
+	      (when (derived-mode-p 'c-mode 'c++-mode)
+		(ggtags-mode 1)))))
+;; synatx templates
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode 1))
+(use-package yasnippet-snippets
+  :ensure t)
+;; syntax checker
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode t))
+;; python stuff
+;; python auto-complete
+(use-package company
+  :ensure t
+  :config
+  (setq initial-major-mode 'company))
+;; lisp flavoured python
+(use-package hy-mode
+  :ensure t
+  :mode "\\.hy\\")
+
+
+;; javascript stuff
+(use-package rjsx-mode
+  :ensure t
+  :mode "\\.js\\")
+;; requires typescript
+(defun setup-tide-mode()
+  "Setup function for tide."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mod +1))
+
+(use-package tide
+  :ensure t
+  :after (rjsx-mode flycheck)
+  :hook (rjsx-mode . setup-tide-mode))
+
+(use-package prettier-js
+  :ensure t
+  :after (rjsx-mode)
+  :hook (rjsx-mode . prettier-js-mode))
+
+;; FUNCTIONAL STUFF
+;; haskell integration
+(use-package haskell-mode
+  :ensure t
+  :config
+  (require 'haskell-mode))
+
+(use-package nix-mode
   :ensure t)
 
+
+;; Text manipulation and utilities
 ;; org-mode stuff
 (use-package org-bullets
   :ensure t
@@ -385,4 +341,18 @@
 (global-set-key (kbd "C-u") 'uncomment-region)
 
 (find-file "/home/flex/my-todos/todos.org")
+
 ;;; .emacs ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js tide rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))

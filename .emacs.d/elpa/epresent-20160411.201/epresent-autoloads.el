@@ -10,9 +10,7 @@
 ;;; Generated autoloads from epresent.el
 
 (autoload 'epresent-run "epresent" "\
-Present an Org-mode buffer.
-
-\(fn)" t nil)
+Present an Org-mode buffer." t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "epresent" '("epresent-")))
 

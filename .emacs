@@ -164,13 +164,7 @@
 	    (lambda ()
 	      (when (derived-mode-p 'c-mode 'c++-mode)
 		(ggtags-mode 1)))))
-;; synatx templates
-(use-package yasnippet
-  :ensure t
-  :init
-  (yas-global-mode 1))
-(use-package yasnippet-snippets
-  :ensure t)
+
 ;; syntax checker
 (use-package flycheck
   :ensure t
@@ -178,10 +172,37 @@
   (global-flycheck-mode t))
 ;; python stuff
 ;; python auto-complete
+;; elpy-dep
 (use-package company
   :ensure t
   :config
   (setq initial-major-mode 'company))
+;; elpy-dep
+(use-package highlight-indentation
+  :ensure t
+  :config
+  (set-face-background 'highlight-indentation-face "#536878")
+  (set-face-background 'highlight-indentation-current-column-face "#657E91"))
+;; elpy-dep
+(use-package pyvenv
+  :ensure t)
+;; elpy-dep
+;; synatx templates
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode 1))
+(use-package yasnippet-snippets
+  :ensure t)
+(use-package s
+  :ensure t)
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "-i --simple-prompt")
+
 ;; lisp flavoured python
 (use-package hy-mode
   :ensure t

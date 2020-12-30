@@ -1,7 +1,0 @@
-cd ~/test/
-g++ -o man mand.cpp
-g++ -o man mand.cpp -st=gnu++17
-g++ -o man mand.cpp -std=gnu++17
-calng++ -o man mand.cpp -std=gnu++17
-clang++ -o man mand.cpp -std=gnu++17
-clang++ -o man mand.cpp -std=gnu++17 -v

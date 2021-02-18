@@ -326,7 +326,6 @@
 (use-package geiser
   :ensure t)
 
-
 ;; Text manipulation and utilities
 ;; org-mode stuff
 (use-package org-bullets

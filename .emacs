@@ -20,7 +20,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js tide rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js tide rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -113,7 +113,12 @@
   (global-set-key (kbd "C-M--") 'default-text-scale-decrease))
 (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
 ;; line numeration
-(global-linum-mode)
+(use-package linum-relative
+  :ensure t
+  :config
+  (require 'linum-relative)
+  (linum-relative-mode t))
+
 (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 ;; window management
 (use-package ace-window
@@ -223,8 +228,7 @@
   (yas-global-mode 1))
 (use-package yasnippet-snippets
   :ensure t)
-(use-package s
-  :ensure t)
+
 (use-package elpy
   :ensure t
   :init
@@ -320,10 +324,22 @@
   :config
   (require 'haskell-mode))
 
-(use-package nix-mode
+(use-package geiser
   :ensure t)
 
-(use-package geiser
+;; modern list API fir emacs-lisp
+(use-package dash
+  :ensure t)
+
+;; string manipulation API for emacs-lisp
+(use-package s
+  :ensure t)
+
+(use-package f
+  :ensure t)
+
+;; lisp utility
+(use-package paredit
   :ensure t)
 
 ;; Text manipulation and utilities

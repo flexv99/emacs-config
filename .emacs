@@ -73,6 +73,7 @@
     (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)))
 ;; theme
 (use-package doom-themes
+  :ensure t
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -117,7 +118,7 @@
   :ensure t
   :config
   (require 'linum-relative)
-  (linum-relative-mode t))
+  (linum-relative-global-mode t))
 
 (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 ;; window management
@@ -228,11 +229,11 @@
   (yas-global-mode 1))
 (use-package yasnippet-snippets
   :ensure t)
-
 (use-package elpy
   :ensure t
   :init
   (elpy-enable))
+(setq python-shell-interpreter "/usr/bin/python3.7")
 ;; lisp flavoured python
 (use-package hy-mode
   :ensure t

@@ -20,7 +20,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js tide rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -32,6 +32,7 @@
 ;; start package.el eith Emacs
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 ;; initialize package.el
 (package-initialize)
 ;; Disable tool-bar
@@ -39,8 +40,9 @@
 ;; Copy paste setup
 (cua-mode t)
 (setq cua-auto-tabify-rectangles nil)
-(transient-mark-mode 1)
 (transient-mark-mode 1) ;; No region when it is not highlighted
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
+(set-face-attribute 'default t :font "DejaVu Sans Mono" )
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
 ;; Editor plug ins
 ;; iserch with shown result
@@ -118,9 +120,9 @@
   :ensure t
   :config
   (require 'linum-relative)
-  (linum-relative-global-mode t))
+  (linum-relative-global-mode t)
+  (setq linum-relative-backend 'display-line-numbers-mode))
 
-(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 ;; window management
 (use-package ace-window
   :ensure t
@@ -133,18 +135,23 @@
 
 (use-package highlight-numbers
   :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'highlight-numbers-mode))
+  :hook (prog-mode-hook . highlight-numbers-mode))
 
 (use-package emojify
-  :hook (add-hook 'after-init-hook #'global-emojify-mode))
+  :ensure t
+  :hook (after-init-hook #'global-emojify-mode))
 
 (use-package smartparens
+  :ensure t
   :hook (prog-mode . smartparens-mode)
   :config
   (smartparens-global-mode t)
   (show-smartparens-global-mode t)
   (require 'smartparens-config))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; shows directories
 (use-package neotree
@@ -257,16 +264,16 @@
 
 ;; use local eslint from node_modules before global
 ;; http://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-(defun my/use-eslint-from-node-modules ()
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (eslint (and root
-                      (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                        root))))
-    (when (and eslint (file-executable-p eslint))
-      (setq-local flycheck-javascript-eslint-executable eslint))))
-(add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+;; (defun my/use-eslint-from-node-modules ()
+;;   (let* ((root (locate-dominating-file
+;;                 (or (buffer-file-name) default-directory)
+;;                 "node_modules"))
+;;          (eslint (and root
+;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
+;;                                         root))))
+;;     (when (and eslint (file-executable-p eslint))
+;;       (setq-local flycheck-javascript-eslint-executable eslint))))
+;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
@@ -279,22 +286,23 @@
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
+;;(add-hook 'js-mode-hook 'js2-minor-mode)
 
-(use-package tide
-  :ensure t
-  :after (rjsx-mode flycheck)
-  :hook (rjsx-mode . setup-tide-mode))
+;; (use-package tide
+;;   :ensure t
+;;   :after (rjsx-mode flycheck)
+;;   :hook (rjsx-mode . setup-tide-mode))
 
-;; requires typescript
-(defun setup-tide-mode()
-  "Setup function for tide."
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mod +1))
+;; ;; requires typescript
+;; (defun setup-tide-mode()
+;;   "Setup function for tide."
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   (company-mod +1))
 
 (use-package prettier-js
   :ensure t
@@ -414,6 +422,7 @@
 (use-package pdf-tools
     :ensure t
     :config
+    (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
     (pdf-tools-install)
     (setq-default pdf-view-display-size 'fit-page)
     (bind-keys :map pdf-view-mode-map

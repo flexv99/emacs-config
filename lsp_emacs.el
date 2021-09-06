@@ -25,6 +25,12 @@
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
+;; setting up the PATH in emacs
+(setenv "PATH" (concat "/home/flex/sources/flutter/bin" ":"
+		       "/home/flex/go/bin" ":"
+		       "/usr/local/go/bin/" ":"
+		       (getenv "PATH")))
+
 ;; start package.el with Emacs
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -292,6 +298,8 @@
   (package-refresh-contents)
   (mapc #'package-install package-selected-packages))
 
+(setq lsp-dart-flutter-sdk-dir "/home/flex/sources/flutter")
+
 (add-hook 'dart-mode-hook 'lsp)
 
 (setq gc-cons-threshold (* 100 1024 1024)
@@ -316,12 +324,12 @@
   ;;             ("C-M-x" . #'hover-run-or-hot-restart)
   ;;             ("C-M-p" . #'hover-take-screenshot'))
   :init
-  (setq flutter-sdk-path (concat (getenv "HOME") "/home/flex/sources/flutter/bin/flutter") ; remove if `flutter` is already in $PATH
-        hover-command-path (concat (getenv "GOPATH") "/home/flex/go/bin/hover") ; remove if `hover` is already in $PATH
-        hover-hot-reload-on-save t
+  (setq hover-flutter-sdk-path "/home/flex/sources/flutter/bin/flutter"
+	hover-command-path "/home/flex/go/bin/hover"
+	hover-hot-reload-on-save t
         hover-screenshot-path (concat (getenv "HOME") "/Pictures"
-				      hover-screenshot-prefix "my-prefix-"
-				      hover-observatory-uri "http://my-custom-host:50300"
+				      hover-screenshot-prefix "screen-shot-"
+				      hover-observatory-uri "http://127.0.0.1:50300"
 				      hover-clear-buffer-on-hot-restart t)))
 
 ;; emacs.el ends here

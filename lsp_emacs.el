@@ -9,16 +9,15 @@
 ;;                                          |___/
 ;; Felix Valentini
 ;; Emcas configuration v.2
-;; last update 03.09.2020
+;; last update 22.09.2020
 
-;; TODO(#1): test
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(lsp-dart lsp-haskell smartparens keycast flycheck pyvenv highlight-indentation company-lsp company yasnippet-snippets yasnippet projectile magit multiple-cursors which-key rainbow-delimiters emojify highlight-numbers ace-window linum-relative default-text-scale nyan-mode spaceline all-the-icons doom-themes counsel disable-mouse use-package lsp-ui)))
+   '(restclient dart-mode lsp-mode lsp-dart lsp-treemacs flycheck company lsp-ui company hover)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -29,8 +28,11 @@
 ;; setting up the PATH in emacs
 (setenv "PATH" (concat "/home/flex/sources/flutter/bin" ":"
 		       "/home/flex/go/bin" ":"
-		       "/usr/local/go/bin/" ":"
+		       "/usr/local/go/bin" ":"
+		       "/home/flex/.nvm/versions/node/v15.5.1/bin" ":"
 		       (getenv "PATH")))
+
+(setq epg-gpg-program "gpg2")
 
 ;; start package.el with Emacs
 (require 'package)
@@ -40,6 +42,9 @@
 (add-to-list 'exec-path "/home/flex/.local/bin")
 ;; initialize package.el
 (package-initialize)
+
+;; space instead of tab
+(setq-default indent-tabs-mode nil)
 
 (setq inhibit-startup-screen t)
 ;; Disable tool-bar
@@ -220,7 +225,7 @@
 (use-package projectile
   :ensure t
   :config
-  (projectile-mode +1)
+  ;; (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (setq projectile-project-search-path '("~/work/vertical-life/02_src/")))
@@ -259,7 +264,7 @@
   (lsp-auto-guess-root nil)
   (lsp-prefer-flymake nil) ;; flycheck instead
   :bind (:map lsp-mode-map ("C-c C-f" . lsp-format-buffer))
-  :hook ((python-mode c-mode) . lsp))
+  :hook ((python-mode c-mode dart-mode js-mode) . lsp))
 
 (use-package lsp-ui
   :ensure t)
@@ -270,9 +275,19 @@
   :config
   (require 'json-snatcher))
 
+;; rest api tester
+(use-package restclient
+  :ensure t
+  :mode (("\\.http\\'" . restclient-mode)))
+
 (use-package json-mode
   :ensure t
   :mode "\\.json\\'")
+
+(use-package prettier-js
+  :ensure t
+  :after (js-mode)
+  :hook (js-mode . prettier-js-mode))
 
 ;; yaml utilities
 (use-package yaml-mode

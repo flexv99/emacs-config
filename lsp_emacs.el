@@ -11,6 +11,7 @@
 ;; Emcas configuration v.2
 ;; last update 03.09.2020
 
+;; TODO(#1): test
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

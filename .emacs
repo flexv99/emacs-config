@@ -1,15 +1,12 @@
 ;;; Package --- Summary
 ;;; Code:
 ;;; Commentary:
-;;; ____________   __            __
-;;; |  _________|  \ \          / /
-;;; | |             \ \        / /
-;;; | |___           \ \      / /
-;;; |  ___|           \ \    / /
-;;; | |                \ \  / /
-;;; | |                 \ \/ /
-;;; |_|                  \__/
-;;;
+;;   __ _                              __ _
+;;  / _| | _____  __   ___ ___  _ __  / _(_) __ _
+;; | |_| |/ _ \ \/ /  / __/ _ \| '_ \| |_| |/ _` |
+;; |  _| |  __/>  <  | (_| (_) | | | |  _| | (_| |
+;; |_| |_|\___/_/\_\  \___\___/|_| |_|_| |_|\__, |
+;;                                          |___/
 ;; Felix Valentini
 ;; Emcas configuration v.2
 ;; last update 30.11.2020
@@ -20,7 +17,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -28,24 +25,35 @@
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
-(setq inhibit-startup-screen t)
 ;; start package.el eith Emacs
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+;; add exec-path for external programs
+(add-to-list 'exec-path "/home/flex/.local/bin")
 ;; initialize package.el
 (package-initialize)
+(setq inhibit-startup-screen t)
 ;; Disable tool-bar
 (tool-bar-mode -1)
 ;; Copy paste setup
 (cua-mode t)
+;; comment/uncomment bindings
+;; enable whitespace-mode
+;; (require 'whitespace)
+;; (global-whitespace-mode 1)
 (setq cua-auto-tabify-rectangles nil)
 (transient-mark-mode 1) ;; No region when it is not highlighted
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
 (set-face-attribute 'default t :font "DejaVu Sans Mono" )
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
 ;; Editor plug ins
-;; iserch with shown result
+(use-package disable-mouse
+  :ensure t
+  :config
+  (require 'disable-mouse)
+  (global-disable-mouse-mode))
 (use-package counsel
   :ensure t)
 (use-package swiper
@@ -108,6 +116,7 @@
   :config
   (require 'nyan-mode)
   (nyan-mode t))
+
 ;; font scaling
 (use-package default-text-scale
   :ensure t
@@ -167,6 +176,27 @@
   :ensure t
   :config
   (which-key-mode))
+
+;; shows typed binding
+(use-package keycast
+  :config
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line."
+    :global t
+    (if keycast-mode
+	(add-hook 'pre-command-hook 'keycast--update t)
+      (remove-hook 'pre-command-hook 'keycast--update)))
+  (add-to-list 'global-mode-string '("" mode-line-keycast " "))
+  (keycast-mode))
+
+(use-package multiple-cursors
+  :ensure t
+  :config
+  (require 'multiple-cursors)
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
 ;; Programming plug-ins
 ;; git interface
@@ -228,6 +258,10 @@
 ;; elpy-dep
 (use-package pyvenv
   :ensure t)
+;; ipython interpreter
+(defun ipython ()
+    (interactive)
+    (term "/usr/bin/ipython"))
 ;; elpy-dep
 ;; synatx templates
 (use-package yasnippet
@@ -236,11 +270,13 @@
   (yas-global-mode 1))
 (use-package yasnippet-snippets
   :ensure t)
+
 (use-package elpy
   :ensure t
   :init
   (elpy-enable))
 (setq python-shell-interpreter "/usr/bin/python3.7")
+
 ;; lisp flavoured python
 (use-package hy-mode
   :ensure t
@@ -319,6 +355,19 @@
   :ensure t
   :mode "\\.json\\'")
 
+;; yaml utilities
+(use-package yaml-mode
+  :ensure t
+  :mode "\\.yml\\'"
+  :config
+  (add-hook 'yaml-mode-hook 'highlight-indentation-mode))
+
+;; Dockerfile mode
+(use-package dockerfile-mode
+  :ensure t
+  :config
+  (require 'dockerfile-mode)
+  (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
 ;; javascript-autocompletion
 ;; tipe clone repo into .emacs.d and inside do npm install
 (add-to-list 'load-path "~/.emacs.d/tern/emacs/")
@@ -328,10 +377,24 @@
 
 ;; FUNCTIONAL STUFF
 ;; haskell integration
+(use-package hindent
+  :ensure t)
+
 (use-package haskell-mode
   :ensure t
   :config
-  (require 'haskell-mode))
+  (require 'haskell-mode)
+  ;; (setq haskell-process-type 'cabal-repl)
+  ;; (setq haskell-process-log t)
+  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  ;;(add-hook 'haskell-mode-hook 'hindent-mode)
+  )
+
+;; ghcid
+(add-to-list 'load-path "~/.emacs.d/elpa/ghcid/")
+(load "ghcid")
 
 (use-package geiser
   :ensure t)
@@ -414,7 +477,7 @@
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-;;pdf-tools to open pdfs
+;; pdf-tools to open pdfs
 (use-package let-alist
   :ensure t) ;; dependency
 (use-package tablist
@@ -463,9 +526,6 @@
 
 (use-package wsd-mode
   :ensure t)
-
-(global-set-key (kbd "C-c") 'comment-region)
-(global-set-key (kbd "C-u") 'uncomment-region)
 
 ;; (find-file "/home/flex/my-todos/todos.org")
 

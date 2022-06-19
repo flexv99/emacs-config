@@ -17,7 +17,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(web-mode eglot elgot hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -30,30 +30,23 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 ;; add exec-path for external programs
-(add-to-list 'exec-path "/home/flex/.local/bin")
+(add-to-list 'exec-path "/home/flex99/.local/bin")
+(setenv "PATH" (concat (getenv "PATH") ":/home/flex99/.yarn/bin"))
 ;; initialize package.el
 (package-initialize)
 (setq inhibit-startup-screen t)
 ;; Disable tool-bar
 (tool-bar-mode -1)
-;; Copy paste setup
-(cua-mode t)
-;; comment/uncomment bindings
 ;; enable whitespace-mode
 ;; (require 'whitespace)
 ;; (global-whitespace-mode 1)
 (setq cua-auto-tabify-rectangles nil)
 (transient-mark-mode 1) ;; No region when it is not highlighted
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
-(set-face-attribute 'default t :font "DejaVu Sans Mono" )
+;; (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
+;; (set-face-attribute 'default t :font "DejaVu Sans Mono" )
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
 ;; Editor plug ins
-(use-package disable-mouse
-  :ensure t
-  :config
-  (require 'disable-mouse)
-  (global-disable-mouse-mode))
 (use-package counsel
   :ensure t)
 (use-package swiper
@@ -208,24 +201,7 @@
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (setq projectile-project-search-path '("~/work/02_src/")))
-;; auto completion funcion for some languages
-(use-package auto-complete
-  :ensure t
-  ;; start autocomplete with emacs
-  :config
-  (require 'auto-complete)) ;;a-c mode 4 org-mode
-;; c-specific auto complete
-(use-package auto-complete-c-headers
-  :ensure t)
-;; function which initializes auto-complete-c-headers and gets called for c/c++ hook
-(defun my:ac-c-header-init()
-  (require 'auto-complete-c-headers)
-  (add-to-list 'ac-sources 'ac-source-c-headers))
-;; to call this funtion from c/c++ hooks
-(add-hook 'c++-mode-hook 'my:ac-c-header-init)
-(add-hook 'c-mode-hook 'my:ac-c-header-init)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 ;; ggtags to find out where the dependecies of a function or class are store and to easily open them
 ;; REQUIRES the package GLOBAL (apt on debian)
 (use-package ggtags
@@ -241,6 +217,9 @@
   :ensure t
   :init
   (global-flycheck-mode t))
+
+
+
 ;; python stuff
 ;; python auto-complete
 ;; elpy-dep
@@ -298,19 +277,6 @@
   (append flycheck-disabled-checkers
           '(javascript-jshint)))
 
-;; use local eslint from node_modules before global
-;; http://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-;; (defun my/use-eslint-from-node-modules ()
-;;   (let* ((root (locate-dominating-file
-;;                 (or (buffer-file-name) default-directory)
-;;                 "node_modules"))
-;;          (eslint (and root
-;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
-;;                                         root))))
-;;     (when (and eslint (file-executable-p eslint))
-;;       (setq-local flycheck-javascript-eslint-executable eslint))))
-;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
-
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
 
@@ -322,23 +288,6 @@
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
 (add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-;;(add-hook 'js-mode-hook 'js2-minor-mode)
-
-;; (use-package tide
-;;   :ensure t
-;;   :after (rjsx-mode flycheck)
-;;   :hook (rjsx-mode . setup-tide-mode))
-
-;; ;; requires typescript
-;; (defun setup-tide-mode()
-;;   "Setup function for tide."
-;;   (interactive)
-;;   (tide-setup)
-;;   (flycheck-mode +1)
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-mode +1)
-;;   (company-mod +1))
 
 (use-package prettier-js
   :ensure t
@@ -422,125 +371,16 @@
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-;;org-beamer for presentations
-;; allow for export=>beamer by placing
-
-;; #+LaTeX_CLASS: beamer in org files
-(unless (boundp 'org-export-latex-classes)
-  (setq org-export-latex-classes nil))
-(add-to-list 'org-export-latex-classes
-  ;; beamer class, for presentations
-             '("beamer"
-               "\\documentclass[11pt]{beamer}\n
-      \\mode<{{{beamermode}}}>\n
-      \\usetheme{{{{beamertheme}}}}\n
-      \\usecolortheme{{{{beamercolortheme}}}}\n
-      \\beamertemplateballitem\n
-      \\setbeameroption{show notes}
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\n
-      \\usepackage{hyperref}\n
-      \\usepackage{color}
-      \\usepackage{listings}
-      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
-  frame=single,
-  basicstyle=\\small,
-  showspaces=false,showstringspaces=false,
-  showtabs=false,
-  keywordstyle=\\color{blue}\\bfseries,
-  commentstyle=\\color{red},
-  }\(not )
-      \\usepackage{verbatim}\n
-      \\(insert )nstitute{{{{beamerinstitute}}}}\n
-       \\subject{{{{beamersubject}}}}\n"
-               
-               ("\\section{%s}" . "\\section*{%s}")
-               
-               ("\\begin{frame}[fragile]\\frametitle{%s}"
-                "\\end{frame}"
-                "\\begin{frame}[fragile]\\frametitle{%s}"
-                "\\end{frame}")))
-
-;; letter class, for formal letters
-
-(add-to-list 'org-export-latex-classes
-             
-             '("letter"
-               "\\documentclass[11pt]{letter}\n
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\(not )
-      \\usepackage{color}"
-               
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;; pdf-tools to open pdfs
-(use-package let-alist
-  :ensure t) ;; dependency
-(use-package tablist
-  :ensure t) ;; dependency
-(use-package pdf-tools
-    :ensure t
-    :config
-    (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
-    (pdf-tools-install)
-    (setq-default pdf-view-display-size 'fit-page)
-    (bind-keys :map pdf-view-mode-map
-        ("\\" . hydra-pdftools/body)
-        ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
-        ("g"  . pdf-view-first-page)
-        ("G"  . pdf-view-last-page)
-        ("l"  . image-forward-hscroll)
-        ("h"  . image-backward-hscroll)
-        ("j"  . pdf-view-next-page)
-        ("k"  . pdf-view-previous-page)
-        ("e"  . pdf-view-goto-page)
-        ("u"  . pdf-view-revert-buffer)
-        ("al" . pdf-annot-list-annotations)
-        ("ad" . pdf-annot-delete)
-        ("aa" . pdf-annot-attachment-dired)
-        ("am" . pdf-annot-add-markup-annotation)
-        ("at" . pdf-annot-add-text-annotation)
-        ("y"  . pdf-view-kill-ring-save)
-        ("i"  . pdf-misc-display-metadata)
-        ("s"  . pdf-occur)
-        ("b"  . pdf-view-set-slice-from-bounding-box)
-        ("r"  . pdf-view-reset-slice)))
-
-;; math-latex
-(use-package latex-math-preview
-  :ensure t)
-
-;; org-epresent(KISS_presentation)
-(use-package epresent
-  :ensure t)
-(use-package org-download
+(use-package web-mode
   :ensure t
   :config
-  (require 'org-download)
-  ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable))
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode)))
 
-(use-package wsd-mode
-  :ensure t)
-
-;; (find-file "/home/flex/my-todos/todos.org")
-
-;; MU4E stuff
-(load-file "~/.config/mu4e/mu4econf.el")
-(add-hook 'mu4e-compose-mode-hook 'turn-on-flyspell)
-(add-hook 'mu4e-compose-mode-hook 'turn-on-auto-fill)
-(use-package mu4e-conversation
-  :ensure t)
-(use-package mu4e-maildirs-extension
-  :ensure t)
-
-(use-package org-mime
+;; lsp support
+(use-package eglot
   :ensure t
+  :hook web-mode
   :config
-  (require 'org-mime)
-  (setq org-mime-library 'mml))
+  (add-to-list 'eglot-server-programs '(web-mode "/home/flex99/.yarn/bin/vls")))
+
 ;;; .emacs ends here

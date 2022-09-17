@@ -31,6 +31,7 @@
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 ;; add exec-path for external programs
 (add-to-list 'exec-path "/home/flex99/.local/bin")
+(add-to-list 'exec-path "/home/flex99/.yarn/bin")
 (setenv "PATH" (concat (getenv "PATH") ":/home/flex99/.yarn/bin"))
 ;; initialize package.el
 (package-initialize)
@@ -202,15 +203,6 @@
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-;; ggtags to find out where the dependecies of a function or class are store and to easily open them
-;; REQUIRES the package GLOBAL (apt on debian)
-(use-package ggtags
-  :ensure t
-  :config
-  (add-hook 'C-mode-common-hook
-	    (lambda ()
-	      (when (derived-mode-p 'c-mode 'c++-mode)
-		(ggtags-mode 1)))))
 
 ;; syntax checker
 (use-package flycheck
@@ -218,17 +210,15 @@
   :init
   (global-flycheck-mode t))
 
-
-
 ;; python stuff
 ;; python auto-complete
 ;; elpy-dep
 (use-package company
   :ensure t
   :config
+  (add-hook 'after-init-hook 'global-company-mode)
   (setq initial-major-mode 'company))
-;; interpreter switch to default
-;; elpy-dep
+
 (use-package highlight-indentation
   :ensure t
   :config
@@ -241,7 +231,7 @@
 (defun ipython ()
     (interactive)
     (term "/usr/bin/ipython"))
-;; elpy-dep
+
 ;; synatx templates
 (use-package yasnippet
   :ensure t
@@ -254,7 +244,7 @@
   :ensure t
   :init
   (elpy-enable))
-(setq python-shell-interpreter "/usr/bin/python3.7")
+(setq python-shell-interpreter "/usr/bin/python3")
 
 ;; lisp flavoured python
 (use-package hy-mode
@@ -266,16 +256,6 @@
 (use-package restclient
   :ensure t
   :mode (("\\.http\\'" . restclient-mode)))
-
-(use-package rjsx-mode
-  :ensure t
-  :config
-  (setq js-indent-level 2))
-
-;; disable jshint I prefer eslint
-(setq-default flycheck-disabled-checkers
-  (append flycheck-disabled-checkers
-          '(javascript-jshint)))
 
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
@@ -317,17 +297,19 @@
   :config
   (require 'dockerfile-mode)
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
-;; javascript-autocompletion
-;; tipe clone repo into .emacs.d and inside do npm install
-(add-to-list 'load-path "~/.emacs.d/tern/emacs/")
-(autoload 'tern-mode "tern.el" nil t)
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-(add-hook 'rjsx-mode-hook (lambda () (tern-mode t)))
 
 ;; FUNCTIONAL STUFF
 ;; haskell integration
 (use-package hindent
   :ensure t)
+
+;; hs-linter
+;; ref: https://raw.githubusercontent.com/ndmitchell/hlint/master/data/hs-lint.el
+(add-to-list 'load-path "~/.emacs.d/elpa/hs-lint/")
+(load "hs-lint")
+(defun my-haskell-hslint-hook ()
+    (local-set-key "\C-cl" 'hs-lint))
+(add-hook 'haskell-mode-hook 'my-haskell-hslint-hook)
 
 (use-package haskell-mode
   :ensure t
@@ -335,13 +317,14 @@
   (require 'haskell-mode)
   ;; (setq haskell-process-type 'cabal-repl)
   ;; (setq haskell-process-log t)
-  (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
+  (add-hook 'haskell-mode-hook 'haskell-indent-mode)
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-  ;;(add-hook 'haskell-mode-hook 'hindent-mode)
-  )
+  (add-hook 'haskell-mode-hook 'hindent-mode)
+  (custom-set-variables '(haskell-process-type 'stack-ghci)))
 
 ;; ghcid
+;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
 (add-to-list 'load-path "~/.emacs.d/elpa/ghcid/")
 (load "ghcid")
 
@@ -381,6 +364,6 @@
   :ensure t
   :hook web-mode
   :config
-  (add-to-list 'eglot-server-programs '(web-mode "/home/flex99/.yarn/bin/vls")))
+  (add-to-list 'eglot-server-programs '(web-mode "typescript-language-server --stdio")))
 
-;;; .emacs ends here
+;;; init.el ends here

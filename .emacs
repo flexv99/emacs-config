@@ -38,7 +38,6 @@
 ;; enable whitespace-mode
 ;; (require 'whitespace)
 ;; (global-whitespace-mode 1)
-(setq cua-auto-tabify-rectangles nil)
 (transient-mark-mode 1) ;; No region when it is not highlighted
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 ;; save annoying backupfiles outside of the working directories
@@ -133,7 +132,7 @@
     (global-set-key [remap other-window] 'ace-window)
     (custom-set-faces
      '(aw-leading-char-face
-       ((t (:inherit ace-jump-face-foreground :height 3.0)))))121))
+       ((t (:inherit ace-jump-face-foreground :height 3.0))))) 121))
 
 (use-package highlight-numbers
   :ensure t
@@ -265,10 +264,6 @@
   (append flycheck-disabled-checkers
     '(json-jsonlist)))
 
-(require 'js2-mode)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode))
-(add-hook 'js2-mode-hook #'js2-imenu-extras-mode)
-
 (use-package prettier-js
   :ensure t
   :after (rjsx-mode)
@@ -367,6 +362,7 @@
          (vue-mode . lsp)
          (python-mode . lsp)
          (haskell-mode . lsp)
+         (js-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :custom

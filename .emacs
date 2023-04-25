@@ -9,15 +9,16 @@
 ;;                                          |___/
 ;; Felix Valentini
 ;; Emcas configuration v.2
-;; last update 30.11.2020
+;; last update 2023-04-25
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(haskell-process-type 'auto)
  '(package-selected-packages
-   '(web-mode eglot elgot hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(lsp-haskell lsp-treemacs lsp-ivy helm-lsp lsp-ui vue-mode lsp-mode web-mode elgot hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -29,10 +30,6 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-;; add exec-path for external programs
-(add-to-list 'exec-path "/home/flex99/.local/bin")
-(add-to-list 'exec-path "/home/flex99/.yarn/bin")
-(setenv "PATH" (concat (getenv "PATH") ":/home/flex99/.yarn/bin"))
 ;; initialize package.el
 (package-initialize)
 (setq inhibit-startup-screen t)
@@ -44,6 +41,8 @@
 (setq cua-auto-tabify-rectangles nil)
 (transient-mark-mode 1) ;; No region when it is not highlighted
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
+;; save annoying backupfiles outside of the working directories
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
 ;; (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
 ;; (set-face-attribute 'default t :font "DejaVu Sans Mono" )
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
@@ -202,7 +201,8 @@
   :config
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c f") 'projectile-find-file))
 
 ;; syntax checker
 (use-package flycheck
@@ -315,13 +315,18 @@
   :ensure t
   :config
   (require 'haskell-mode)
-  ;; (setq haskell-process-type 'cabal-repl)
-  ;; (setq haskell-process-log t)
-  (add-hook 'haskell-mode-hook 'haskell-indent-mode)
+  (add-hook 'haskell-mode-hook #'lsp)
+  (add-hook 'haskell-literate-mode-hook #'lsp)
+  (add-hook 'haskell-mode-hook #'flycheck-mode)
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
   (add-hook 'haskell-mode-hook 'hindent-mode)
-  (custom-set-variables '(haskell-process-type 'stack-ghci)))
+  (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
+  (custom-set-variables '(haskell-process-type 'auto)))
+
+(use-package lsp-haskell
+  :ensure t)
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
@@ -354,16 +359,36 @@
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package web-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode)))
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (
+         (vue-mode . lsp)
+         (python-mode . lsp)
+         (haskell-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :custom
+  (lsp-vetur-format-default-formatter-css "none")
+  (lsp-vetur-format-default-formatter-html "none")
+  (lsp-vetur-format-default-formatter-js "none")
+  (lsp-vetur-validation-template nil)
+  :commands lsp)
 
-;; lsp support
-(use-package eglot
-  :ensure t
-  :hook web-mode
+(use-package vue-mode
+  :mode "\\.vue\\'"
+  :hook (vue-mode . prettier-js-mode)
   :config
-  (add-to-list 'eglot-server-programs '(web-mode "typescript-language-server --stdio")))
+  (add-hook 'vue-mode-hook #'lsp)
+  (setq prettier-js-args '("--parser vue")))
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 ;;; init.el ends here

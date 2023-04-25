@@ -25,14 +25,6 @@
  ;; If there is more than one, they won't work right.
  '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 
-;; setting up the PATH in emacs
-(setenv "PATH" (concat "/home/flex/sources/flutter/bin" ":"
-		       "/home/flex/go/bin" ":"
-		       "/usr/local/go/bin" ":"
-		       "/home/flex/.nvm/versions/node/v15.5.1/bin" ":"
-		       (getenv "PATH")))
-
-(setq epg-gpg-program "gpg2")
 
 ;; start package.el with Emacs
 (require 'package)
@@ -299,12 +291,6 @@
 (use-package pyvenv
   :ensure t)
 
-(use-package lsp-haskell
-  :ensure t
-  :config
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-literate-mode-hook #'lsp))
-
 (setq package-selected-packages 
   '(dart-mode lsp-mode lsp-dart lsp-treemacs flycheck company
     ;; Optional packages
@@ -313,8 +299,6 @@
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
   (package-refresh-contents)
   (mapc #'package-install package-selected-packages))
-
-(setq lsp-dart-flutter-sdk-dir "/home/flex/sources/flutter")
 
 (add-hook 'dart-mode-hook 'lsp)
 
@@ -333,19 +317,5 @@
                                      :program "lib/main_debug.dart"
                                      :args '("--flavor" "customer_a"))))
 
-(use-package hover
-  :after dart-mode
-  ;; :bind (:map dart-mode-map
-  ;;             ("C-M-z" . #'hover-run-or-hot-reload)
-  ;;             ("C-M-x" . #'hover-run-or-hot-restart)
-  ;;             ("C-M-p" . #'hover-take-screenshot'))
-  :init
-  (setq hover-flutter-sdk-path "/home/flex/sources/flutter/bin/flutter"
-	hover-command-path "/home/flex/go/bin/hover"
-	hover-hot-reload-on-save t
-        hover-screenshot-path (concat (getenv "HOME") "/Pictures"
-				      hover-screenshot-prefix "screen-shot-"
-				      hover-observatory-uri "http://127.0.0.1:50300"
-				      hover-clear-buffer-on-hot-restart t)))
 
 ;; emacs.el ends here

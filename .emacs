@@ -18,7 +18,7 @@
  ;; If there is more than one, they won't work right.
  '(haskell-process-type 'auto)
  '(package-selected-packages
-   '(lsp-haskell lsp-treemacs lsp-ivy helm-lsp lsp-ui vue-mode lsp-mode web-mode elgot hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
+   '(markdown-mode lsp-haskell elpy pyvenv highlight-indentation lsp-treemacs lsp-ivy helm-lsp lsp-ui vue-mode lsp-mode web-mode elgot hindent keycast dockerfile-mode disable-mouse yaml-mode multiple-cursors rainbow-delimiters linum-relative f paredit geiser restclient org emojify json-mode mu4e-maildirs-extension magit projectile mu4e-conversation mu4e-alert smartparens doom-themes wsd-mode org-download epresent latex-math-preview pdf-tools tablist org-bullets nix-mode haskell-mode prettier-js rjsx-mode hy-mode company flycheck yasnippet-snippets yasnippet ggtags auto-complete-c-headers auto-complete which-key neotree highlight-numbers ace-window default-text-scale nyan-mode spaceline all-the-icons counsel use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -169,18 +169,6 @@
   :config
   (which-key-mode))
 
-;; shows typed binding
-(use-package keycast
-  :config
-  (define-minor-mode keycast-mode
-    "Show current command and its key binding in the mode line."
-    :global t
-    (if keycast-mode
-	(add-hook 'pre-command-hook 'keycast--update t)
-      (remove-hook 'pre-command-hook 'keycast--update)))
-  (add-to-list 'global-mode-string '("" mode-line-keycast " "))
-  (keycast-mode))
-
 (use-package multiple-cursors
   :ensure t
   :config
@@ -304,24 +292,25 @@
 (load "hs-lint")
 (defun my-haskell-hslint-hook ()
     (local-set-key "\C-cl" 'hs-lint))
-(add-hook 'haskell-mode-hook 'my-haskell-hslint-hook)
 
 (use-package haskell-mode
   :ensure t
   :config
   (require 'haskell-mode)
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-literate-mode-hook #'lsp)
   (add-hook 'haskell-mode-hook #'flycheck-mode)
-  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
   (add-hook 'haskell-mode-hook 'hindent-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (setq haskell-process-type 'cabal-repl)
   (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
-  (custom-set-variables '(haskell-process-type 'auto)))
-
-(use-package lsp-haskell
-  :ensure t)
+  (add-hook 'haskell-mode-hook 'my-haskell-hslint-hook)
+  (define-key haskell-mode-map (kbd "M-[") 'haskell-navigate-imports)
+  (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return)
+  (custom-set-variables '(haskell-process-type 'auto))
+  ;; https://github.com/erikbackman/haskell-ts-mode/tree/master
+  (add-to-list 'load-path (concat user-emacs-directory "haskell-ts-mode"))
+  (require 'haskell-ts-mode))
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
@@ -337,9 +326,6 @@
 
 ;; string manipulation API for emacs-lisp
 (use-package s
-  :ensure t)
-
-(use-package f
   :ensure t)
 
 ;; lisp utility
@@ -361,7 +347,6 @@
   :hook (
          (vue-mode . lsp)
          (python-mode . lsp)
-         (haskell-mode . lsp)
          (js-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
@@ -377,7 +362,10 @@
   :hook (vue-mode . prettier-js-mode)
   :config
   (add-hook 'vue-mode-hook #'lsp)
-  (setq prettier-js-args '("--parser vue")))
+  (setq prettier-js-args '("--parser vue"))
+  ;; https://github.com/8uff3r/vue-ts-mode
+  (add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
+  (require 'vue-ts-mode))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -386,5 +374,31 @@
 ;; if you are ivy user
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+(setq treesit-language-source-alist
+   '((css "https://github.com/tree-sitter/tree-sitter-css")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     (haskell "https://github.com/tree-sitter/tree-sitter-haskell" "master" "src")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml")
+     (vue "https://github.com/ikatyang/tree-sitter-vue")))
+
+(setq major-mode-remap-alist
+ '((yaml-mode . yaml-ts-mode)
+   (js2-mode . js-ts-mode)
+   (typescript-mode . typescript-ts-mode)
+   (json-mode . json-ts-mode)
+   (css-mode . css-ts-mode)
+   (python-mode . python-ts-mode)
+   (haskell-mode . haskell-ts-mode)
+   (markdown-mode . markdown-ts-mode)))
 
 ;;; init.el ends here

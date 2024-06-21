@@ -42,6 +42,9 @@
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 ;; save annoying backupfiles outside of the working directories
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup")))
+;; macos uk layout specific
+(setq ns-alternate-modifier 'meta)
+(setq ns-right-alternate-modifier 'none)
 ;; (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono" ))
 ;; (set-face-attribute 'default t :font "DejaVu Sans Mono" )
 ;; use spaces instead of tab, to convert tabbed document to spaced one selct the whole doc (C-x h; M-x unatbify)
@@ -291,12 +294,16 @@
 (add-to-list 'load-path "~/.emacs.d/elpa/hs-lint/")
 (load "hs-lint")
 (defun my-haskell-hslint-hook ()
-    (local-set-key "\C-cl" 'hs-lint))
+  (local-set-key "\C-cl" 'hs-lint))
+
+(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
 (use-package haskell-mode
   :ensure t
   :config
   (require 'haskell-mode)
+  (require 'hs-lint)
+  (add-hook 'hs-lint-mode-hook 'ansi-color-for-comint-mode-on)
   (add-hook 'haskell-mode-hook #'flycheck-mode)
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
@@ -309,8 +316,9 @@
   (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return)
   (custom-set-variables '(haskell-process-type 'auto))
   ;; https://github.com/erikbackman/haskell-ts-mode/tree/master
-  (add-to-list 'load-path (concat user-emacs-directory "haskell-ts-mode"))
-  (require 'haskell-ts-mode))
+  ;; (add-to-list 'load-path (concat user-emacs-directory "haskell-ts-mode"))
+  ;; (require 'haskell-ts-mode)
+  )
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
@@ -362,10 +370,12 @@
   :hook (vue-mode . prettier-js-mode)
   :config
   (add-hook 'vue-mode-hook #'lsp)
+  (add-hook 'vue-mode-hook 'prettier-js-mode)
   (setq prettier-js-args '("--parser vue"))
   ;; https://github.com/8uff3r/vue-ts-mode
   (add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
-  (require 'vue-ts-mode))
+  (require 'vue-ts-mode)
+  (add-hook 'vue-mode-hook 'vue-ts-mode))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -398,7 +408,7 @@
    (json-mode . json-ts-mode)
    (css-mode . css-ts-mode)
    (python-mode . python-ts-mode)
-   (haskell-mode . haskell-ts-mode)
+   ;; (haskell-mode . haskell-ts-mode)
    (markdown-mode . markdown-ts-mode)))
 
 ;;; init.el ends here

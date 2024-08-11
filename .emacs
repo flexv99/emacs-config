@@ -429,7 +429,7 @@
 
 ;; font: https://github.com/tonsky/FiraCode
 (set-face-attribute 'default nil
-                :family "FiraCode")
+                    :family "Fira Code" :weight 'normal :height 120)
 
 (use-package ligature
   :load-path "/Users/felixvalentini/sources/FiraCode"

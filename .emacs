@@ -502,4 +502,8 @@
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
+(use-package ox-moderncv
+    :load-path "/Users/felixvalentini/sources/org-cv/"
+    :init (require 'ox-moderncv))
+
 ;;; init.el ends here

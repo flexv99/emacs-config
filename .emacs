@@ -306,7 +306,7 @@
 
 ;; hs-linter
 ;; ref: https://raw.githubusercontent.com/ndmitchell/hlint/master/data/hs-lint.el
-(add-to-list 'load-path "~/.emacs.d/elpa/hs-lint/")
+(add-to-list 'load-path "~/.emacs.d/hs-lint/")
 (load "hs-lint")
 (defun my-haskell-hslint-hook ()
   (local-set-key "\C-cl" 'hs-lint))
@@ -337,7 +337,7 @@
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
-(add-to-list 'load-path "~/.emacs.d/elpa/ghcid/")
+(add-to-list 'load-path "~/.emacs.d/ghcid/")
 (load "ghcid")
 
 (use-package geiser
@@ -425,6 +425,9 @@
    (python-mode . python-ts-mode)
    ;; (haskell-mode . haskell-ts-mode)
    (markdown-mode . markdown-ts-mode)))
+
+(use-package markdown-mode
+  :ensure t)
 
 
 ;; font: https://github.com/tonsky/FiraCode

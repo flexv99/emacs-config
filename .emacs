@@ -19,21 +19,23 @@
  '(haskell-process-type 'auto)
  '(ignored-local-variable-values '((intero-targets "smapr:lib" "smapr:test")))
  '(package-selected-packages
-   '(ace-window all-the-icons auto-complete auto-complete-c-headers
-                company counsel default-text-scale disable-mouse
-                dockerfile-mode doom-themes elgot elpy emojify
-                epresent f flycheck geiser ggtags haskell-mode
-                helm-lsp highlight-indentation highlight-numbers
-                hindent hy-mode json-mode keycast latex-math-preview
-                ligature linum-relative lsp-haskell lsp-ivy lsp-mode
-                lsp-treemacs lsp-ui magit markdown-mode mu4e-alert
-                mu4e-conversation mu4e-maildirs-extension
+   '(ace-window all-the-icons apheleia auto-complete
+                auto-complete-c-headers company counsel
+                default-text-scale disable-mouse dockerfile-mode
+                doom-themes elgot elpy emojify epresent f flycheck
+                geiser ggtags haskell-mode helm-lsp
+                highlight-indentation highlight-numbers hindent
+                hy-mode json-mode keycast latex-math-preview ligature
+                linum-relative lsp-haskell lsp-ivy lsp-mode
+                lsp-treemacs lsp-ui magit markdown-mode move-text
+                mu4e-alert mu4e-conversation mu4e-maildirs-extension
                 multiple-cursors neotree nix-mode nyan-mode org
-                org-bullets org-download paredit pdf-tools prettier-js
+                org-bullets org-download ormolu paredit pdf-tools
                 projectile pyvenv rainbow-delimiters restclient
-                rjsx-mode smartparens spaceline tablist use-package
-                vue-mode web-mode which-key wsd-mode yaml-mode
-                yasnippet yasnippet-snippets)))
+                rjsx-mode smartparens spaceline tablist
+                typescript-mode use-package vue-mode web-mode
+                which-key wsd-mode yaml-mode yasnippet
+                yasnippet-snippets)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -172,6 +174,11 @@
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package move-text
+  :ensure t
+  :config
+  (move-text-default-bindings))
+
 ;; shows directories
 (use-package neotree
   :ensure t
@@ -234,8 +241,8 @@
   :ensure t)
 ;; ipython interpreter
 (defun ipython ()
-    (interactive)
-    (term "/usr/bin/ipython"))
+  (interactive)
+  (term "/usr/bin/ipython"))
 
 ;; synatx templates
 (use-package yasnippet
@@ -267,13 +274,8 @@
 
 ;; disable json-jsonlist checking for json files
 (setq-default flycheck-disabled-checkers
-  (append flycheck-disabled-checkers
-    '(json-jsonlist)))
-
-(use-package prettier-js
-  :ensure t
-  :after (rjsx-mode)
-  :hook (rjsx-mode . prettier-js-mode))
+              (append flycheck-disabled-checkers
+                      '(json-jsonlist)))
 
 ;; json utilities
 (use-package json-snatcher
@@ -324,6 +326,7 @@
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
   (add-hook 'haskell-mode-hook 'hindent-mode)
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'eglot-ensure)
   (setq haskell-process-type 'cabal-repl)
   (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
   (add-hook 'haskell-mode-hook 'my-haskell-hslint-hook)
@@ -334,6 +337,12 @@
   ;; (add-to-list 'load-path (concat user-emacs-directory "haskell-ts-mode"))
   ;; (require 'haskell-ts-mode)
   )
+
+(use-package ormolu
+  :hook (haskell-mode . ormolu-format-on-save-mode)
+  :bind
+  (:map haskell-mode-map
+        ("C-c r" . ormolu-format-buffer)))
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
@@ -401,30 +410,30 @@
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 (setq treesit-language-source-alist
-   '((css "https://github.com/tree-sitter/tree-sitter-css")
-     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-     (html "https://github.com/tree-sitter/tree-sitter-html")
-     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-     (json "https://github.com/tree-sitter/tree-sitter-json")
-     (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-     (python "https://github.com/tree-sitter/tree-sitter-python")
-     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-     (haskell "https://github.com/tree-sitter/tree-sitter-haskell" "master" "src")
-     (yaml "https://github.com/ikatyang/tree-sitter-yaml")
-     (vue "https://github.com/ikatyang/tree-sitter-vue")))
+      '((css "https://github.com/tree-sitter/tree-sitter-css")
+        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        (html "https://github.com/tree-sitter/tree-sitter-html")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (make "https://github.com/alemuller/tree-sitter-make")
+        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+        (toml "https://github.com/tree-sitter/tree-sitter-toml")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        (haskell "https://github.com/tree-sitter/tree-sitter-haskell" "master" "src")
+        (yaml "https://github.com/ikatyang/tree-sitter-yaml")
+        (vue "https://github.com/ikatyang/tree-sitter-vue")))
 
 (setq major-mode-remap-alist
- '((yaml-mode . yaml-ts-mode)
-   (js2-mode . js-ts-mode)
-   (typescript-mode . typescript-ts-mode)
-   (json-mode . json-ts-mode)
-   (css-mode . css-ts-mode)
-   (python-mode . python-ts-mode)
-   ;; (haskell-mode . haskell-ts-mode)
-   (markdown-mode . markdown-ts-mode)))
+      '((yaml-mode . yaml-ts-mode)
+        (js2-mode . js-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (json-mode . json-ts-mode)
+        (css-mode . css-ts-mode)
+        (python-mode . python-ts-mode)
+        ;; (haskell-mode . haskell-ts-mode)
+        (markdown-mode . markdown-ts-mode)))
 
 (use-package markdown-mode
   :ensure t)
@@ -435,7 +444,6 @@
                     :family "Fira Code" :weight 'normal :height 120)
 
 (use-package ligature
-  :load-path "/Users/felixvalentini/sources/FiraCode"
   :config
   ;; Enable the "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www"))
@@ -444,69 +452,91 @@
   (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
   ;; Enable all Cascadia and Fira Code ligatures in programming modes
   (ligature-set-ligatures 'prog-mode
-                        '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
-                          ;; =:= =!=
-                          ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
-                          ;; ;; ;;;
-                          (";" (rx (+ ";")))
-                          ;; && &&&
-                          ("&" (rx (+ "&")))
-                          ;; !! !!! !. !: !!. != !== !~
-                          ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
-                          ;; ?? ??? ?:  ?=  ?.
-                          ("?" (rx (or ":" "=" "\." (+ "?"))))
-                          ;; %% %%%
-                          ("%" (rx (+ "%")))
-                          ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
-                          ;; |->>-||-<<-| |- |== ||=||
-                          ;; |==>>==<<==<=>==//==/=!==:===>
-                          ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
-                                          "-" "=" ))))
-                          ;; \\ \\\ \/
-                          ("\\" (rx (or "/" (+ "\\"))))
-                          ;; ++ +++ ++++ +>
-                          ("+" (rx (or ">" (+ "+"))))
-                          ;; :: ::: :::: :> :< := :// ::=
-                          (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
-                          ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
-                          ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
-                                          "="))))
-                          ;; .. ... .... .= .- .? ..= ..<
-                          ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
-                          ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
-                          ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
-                          ;; *> */ *)  ** *** ****
-                          ("*" (rx (or ">" "/" ")" (+ "*"))))
-                          ;; www wwww
-                          ("w" (rx (+ "w")))
-                          ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
-                          ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
-                          ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
-                          ;; << <<< <<<<
-                          ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
-                                          "-"  "/" "|" "="))))
-                          ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
-                          ;; >> >>> >>>>
-                          (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
-                          ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
-                          ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
-                                       (+ "#"))))
-                          ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
-                          ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
-                          ;; __ ___ ____ _|_ __|____|_
-                          ("_" (rx (+ (or "_" "|"))))
-                          ;; Fira code: 0xFF 0x12
-                          ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
-                          ;; Fira code:
-                          "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
-                          ;; The few not covered by the regexps.
-                          "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
+                          '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+                            ;; =:= =!=
+                            ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+                            ;; ;; ;;;
+                            (";" (rx (+ ";")))
+                            ;; && &&&
+                            ("&" (rx (+ "&")))
+                            ;; !! !!! !. !: !!. != !== !~
+                            ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+                            ;; ?? ??? ?:  ?=  ?.
+                            ("?" (rx (or ":" "=" "\." (+ "?"))))
+                            ;; %% %%%
+                            ("%" (rx (+ "%")))
+                            ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+                            ;; |->>-||-<<-| |- |== ||=||
+                            ;; |==>>==<<==<=>==//==/=!==:===>
+                            ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+                                            "-" "=" ))))
+                            ;; \\ \\\ \/
+                            ("\\" (rx (or "/" (+ "\\"))))
+                            ;; ++ +++ ++++ +>
+                            ("+" (rx (or ">" (+ "+"))))
+                            ;; :: ::: :::: :> :< := :// ::=
+                            (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+                            ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+                            ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+                                            "="))))
+                            ;; .. ... .... .= .- .? ..= ..<
+                            ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+                            ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+                            ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+                            ;; *> */ *)  ** *** ****
+                            ("*" (rx (or ">" "/" ")" (+ "*"))))
+                            ;; www wwww
+                            ("w" (rx (+ "w")))
+                            ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+                            ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
+                            ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+                            ;; << <<< <<<<
+                            ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+                                            "-"  "/" "|" "="))))
+                            ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+                            ;; >> >>> >>>>
+                            (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+                            ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+                            ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+                                         (+ "#"))))
+                            ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+                            ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+                            ;; __ ___ ____ _|_ __|____|_
+                            ("_" (rx (+ (or "_" "|"))))
+                            ;; Fira code: 0xFF 0x12
+                            ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+                            ;; Fira code:
+                            "Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
+                            ;; The few not covered by the regexps.
+                            "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
 (use-package ox-moderncv
-    :load-path "/Users/felixvalentini/sources/org-cv/"
-    :init (require 'ox-moderncv))
+  :load-path "/home/flex99/sources/org-cv/"
+  :init (require 'ox-moderncv))
 
-;;; init.el ends here
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+(use-package typescript-mode
+  :after tree-sitter
+  :config
+  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
+  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
+  (define-derived-mode typescriptreact-mode typescript-mode
+    "TypeScript TSX")
+
+  ;; use our derived mode for tsx files
+  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
+  ;; by default, typescript-mode is mapped to the treesitter typescript parser
+  ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
+
+(use-package apheleia
+  :ensure t
+  :config
+  (apheleia-global-mode +1))
+
+;;; init.el ends hereq

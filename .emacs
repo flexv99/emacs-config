@@ -11,37 +11,7 @@
 ;; Emcas configuration v.2
 ;; last update 2023-04-25
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(haskell-process-type 'auto)
- '(ignored-local-variable-values '((intero-targets "smapr:lib" "smapr:test")))
- '(package-selected-packages
-   '(ace-window all-the-icons apheleia auto-complete
-                auto-complete-c-headers company counsel
-                default-text-scale disable-mouse dockerfile-mode
-                doom-themes elgot elpy emojify epresent f flycheck
-                geiser ggtags haskell-mode helm-lsp
-                highlight-indentation highlight-numbers hindent
-                hy-mode json-mode keycast latex-math-preview ligature
-                linum-relative lsp-haskell lsp-ivy lsp-mode
-                lsp-treemacs lsp-ui magit markdown-mode move-text
-                mu4e-alert mu4e-conversation mu4e-maildirs-extension
-                multiple-cursors neotree nix-mode nyan-mode org
-                org-bullets org-download ormolu paredit pdf-tools
-                projectile pyvenv rainbow-delimiters restclient
-                rjsx-mode smartparens spaceline tablist
-                typescript-mode use-package vue-mode web-mode
-                which-key wsd-mode yaml-mode yasnippet
-                yasnippet-snippets)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 3.0)))))
+(setq custom-file "~/.emacs.custom.el")
 
 ;; start package.el eith Emacs
 (require 'package)

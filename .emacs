@@ -12,6 +12,7 @@
 ;; last update 2023-04-25
 
 (setq custom-file "~/.emacs.custom.el")
+(load-file custom-file)
 
 ;; start package.el eith Emacs
 (require 'package)

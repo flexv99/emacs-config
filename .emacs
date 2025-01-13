@@ -14,6 +14,8 @@
 (setq custom-file "~/.emacs.custom.el")
 (load-file custom-file)
 
+(setenv "PATH" (concat "/Users/felixvalentini/.cabal/bin:" (getenv "PATH")))
+
 ;; start package.el eith Emacs
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
@@ -128,6 +130,10 @@
 (use-package highlight-numbers
   :ensure t
   :hook (prog-mode-hook . highlight-numbers-mode))
+
+(use-package colorful-mode
+  :ensure t
+  :hook (prog-mode text-mode))
 
 (use-package emojify
   :ensure t
@@ -277,21 +283,11 @@
 (use-package hindent
   :ensure t)
 
-;; hs-linter
-;; ref: https://raw.githubusercontent.com/ndmitchell/hlint/master/data/hs-lint.el
-(add-to-list 'load-path "~/.emacs.d/hs-lint/")
-(load "hs-lint")
-(defun my-haskell-hslint-hook ()
-  (local-set-key "\C-cl" 'hs-lint))
-
-(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
 (use-package haskell-mode
   :ensure t
   :config
   (require 'haskell-mode)
-  (require 'hs-lint)
-  (add-hook 'hs-lint-mode-hook 'ansi-color-for-comint-mode-on)
   (add-hook 'haskell-mode-hook #'flycheck-mode)
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
   (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
@@ -299,25 +295,34 @@
   (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
   (add-hook 'haskell-mode-hook 'eglot-ensure)
   (setq haskell-process-type 'cabal-repl)
+  (setq haskell-svg-render-images t)
+  (setq-default eglot-workspace-configuration
+                '((haskell
+                   (formattingProvider . "fourmolu"))))
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'eglot-format-buffer -10 t)))
   (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
-  (add-hook 'haskell-mode-hook 'my-haskell-hslint-hook)
   (define-key haskell-mode-map (kbd "M-[") 'haskell-navigate-imports)
-  (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return)
-  (custom-set-variables '(haskell-process-type 'auto))
-  ;; https://github.com/erikbackman/haskell-ts-mode/tree/master
-  ;; (add-to-list 'load-path (concat user-emacs-directory "haskell-ts-mode"))
-  ;; (require 'haskell-ts-mode)
-  )
+  (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return))
 
-(use-package ormolu
-  :hook (haskell-mode . ormolu-format-on-save-mode)
-  :bind
-  (:map haskell-mode-map
-        ("C-c r" . ormolu-format-buffer)))
+;; (add-to-list 'load-path "~/sources/haskell-ts-mode")
+;; (require 'haskell-ts-mode)
+
+;; (add-to-list 'treesit-language-source-alist
+;; 	     '(haskell . ("https://github.com/tree-sitter/tree-sitter-haskell" "master" "src")))
+
+;; (with-eval-after-load 'eglot (haskell-ts-setup-eglot))
+
+;; (use-package ormolu
+;;   :hook (haskell-ts-mode . ormolu-format-on-save-mode)
+;;   :bind
+;;   (:map haskell-mode-map
+;;         ("C-c r" . ormolu-format-buffer)))
 
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
-(add-to-list 'load-path "~/.emacs.d/ghcid/")
+(add-to-list 'load-path "~/sources/ghcid/plugins/emacs")
 (load "ghcid")
 
 (use-package geiser
@@ -485,8 +490,12 @@
   (global-ligature-mode t))
 
 (use-package ox-moderncv
-  :load-path "/home/flex99/sources/org-cv/"
+  :load-path "/Users/felixvalentini/sources/org-cv/"
   :init (require 'ox-moderncv))
+
+(use-package ox-altacv
+  :load-path "/Users/felixvalentini/sources/org-cv/"
+  :init (require 'ox-altacv))
 
 (use-package nix-mode
   :mode "\\.nix\\'")
@@ -506,8 +515,9 @@
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
 
 (use-package apheleia
-  :ensure t
-  :config
-  (apheleia-global-mode +1))
+  :ensure t)
 
-;;; init.el ends hereq
+(use-package dart-mode
+  :ensure t)
+
+;;; init.el ends here

@@ -110,12 +110,7 @@
   (global-set-key (kbd "C-M--") 'default-text-scale-decrease))
 (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
 ;; line numeration
-(use-package linum-relative
-  :ensure t
-  :config
-  (require 'linum-relative)
-  (linum-relative-global-mode t)
-  (setq linum-relative-backend 'display-line-numbers-mode))
+ (global-display-line-numbers-mode 1)
 
 ;; window management
 (use-package ace-window
@@ -488,14 +483,6 @@
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
-
-(use-package ox-moderncv
-  :load-path "/Users/felixvalentini/sources/org-cv/"
-  :init (require 'ox-moderncv))
-
-(use-package ox-altacv
-  :load-path "/Users/felixvalentini/sources/org-cv/"
-  :init (require 'ox-altacv))
 
 (use-package nix-mode
   :mode "\\.nix\\'")

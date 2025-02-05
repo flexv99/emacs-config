@@ -14,7 +14,7 @@
 (setq custom-file "~/.emacs.custom.el")
 (load-file custom-file)
 
-(setenv "PATH" (concat "/Users/felixvalentini/.cabal/bin:" (getenv "PATH")))
+(setenv "PATH" (concat "/Users/flex99/.cabal/bin:" (getenv "PATH")))
 
 ;; start package.el eith Emacs
 (require 'package)
@@ -109,8 +109,14 @@
   (global-set-key (kbd "C-M-=") 'default-text-scale-increase)
   (global-set-key (kbd "C-M--") 'default-text-scale-decrease))
 (define-key ctl-x-map [(control ?0)] 'zoom-in/out)
+
 ;; line numeration
- (global-display-line-numbers-mode 1)
+(use-package linum-relative
+  :ensure t
+  :config
+  (setq linum-relative-current-symbol "->")
+  (setq linum-relative-format "%3s ")
+  (linum-relative-global-mode t))
 
 ;; window management
 (use-package ace-window
@@ -152,12 +158,11 @@
   (move-text-default-bindings))
 
 ;; shows directories
-(use-package neotree
+(use-package dir-treeview
   :ensure t
   :config
-  (require 'neotree)
-  (global-set-key [f8] 'neotree-toggle)
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
+  (global-set-key [f8] 'dir-treeview))
+
 (setq-default indent-tabs-mode nil)
 
 ;; shows bindings options
@@ -281,14 +286,15 @@
 
 (use-package haskell-mode
   :ensure t
+  :hook
+  (haskell-mode . (lambda () (flycheck-mode -1)))
+  (haskell-mode . hindent-mode)
+  (haskell-mode . haskell-doc-mode)
+  (haskell-mode . interactive-haskell-mode)
+  (haskell-mode . eglot-ensure)
   :config
   (require 'haskell-mode)
-  (add-hook 'haskell-mode-hook #'flycheck-mode)
-  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-  (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-  (add-hook 'haskell-mode-hook 'hindent-mode)
-  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-  (add-hook 'haskell-mode-hook 'eglot-ensure)
+  (require 'w3m-haddock)
   (setq haskell-process-type 'cabal-repl)
   (setq haskell-svg-render-images t)
   (setq-default eglot-workspace-configuration
@@ -297,9 +303,31 @@
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'eglot-format-buffer -10 t)))
+  (add-to-list 'eglot-server-programs
+               '(haskell-mode . ("haskell-language-server" "--lsp")))
   (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
   (define-key haskell-mode-map (kbd "M-[") 'haskell-navigate-imports)
-  (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return))
+  (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return)
+  (define-key haskell-mode-map (kbd "C-c C-d") 'haskell-w3m-open-haddock))
+
+(use-package w3m
+  :ensure t
+  :hook (w3m-mode . w3m-haddock-display)
+  :config
+  (setq w3m-mode-map (make-sparse-keymap))
+  (define-key w3m-mode-map (kbd "RET") 'w3m-view-this-url)
+  (define-key w3m-mode-map (kbd "q") 'bury-buffer)
+  (define-key w3m-mode-map (kbd "<mouse-1>") 'w3m-maybe-url)
+  (define-key w3m-mode-map [f5] 'w3m-reload-this-page)
+  (define-key w3m-mode-map (kbd "M-<left>") 'w3m-view-previous-page)
+  (define-key w3m-mode-map (kbd "M-<right>") 'w3m-view-next-page)
+  (define-key w3m-mode-map (kbd "M-.") 'w3m-haddock-find-tag))
+
+(defun w3m-maybe-url ()
+  (interactive)
+  (if (or (equal '(w3m-anchor) (get-text-property (point) 'face))
+          (equal '(w3m-arrived-anchor) (get-text-property (point) 'face)))
+      (w3m-view-this-url)))
 
 ;; (add-to-list 'load-path "~/sources/haskell-ts-mode")
 ;; (require 'haskell-ts-mode)
@@ -409,7 +437,6 @@
 (use-package markdown-mode
   :ensure t)
 
-
 ;; font: https://github.com/tonsky/FiraCode
 (set-face-attribute 'default nil
                     :family "Fira Code" :weight 'normal :height 120)
@@ -489,6 +516,7 @@
 
 (use-package typescript-mode
   :after tree-sitter
+  :hook ((typescript-mode . eglot-ensure))
   :config
   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
@@ -505,6 +533,13 @@
   :ensure t)
 
 (use-package dart-mode
-  :ensure t)
+  :ensure t
+  :hook ((dart-mode . eglot-ensure))
+  :config
+   (with-eval-after-load 'eglot
+        (add-to-list 'eglot-server-programs
+                     '((dart-mode) . ("fvm" "dart" "language-server" "--client-id" "emacs.eglot-dart")))))
+
+(add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
 
 ;;; init.el ends here

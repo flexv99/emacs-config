@@ -163,6 +163,11 @@
   :config
   (global-set-key [f8] 'dir-treeview))
 
+(use-package breadcrumb
+  :ensure t
+  :config
+  (breadcrumb-mode 1))
+
 (setq-default indent-tabs-mode nil)
 
 ;; shows bindings options
@@ -538,7 +543,10 @@
   :config
    (with-eval-after-load 'eglot
         (add-to-list 'eglot-server-programs
-                     '((dart-mode) . ("fvm" "dart" "language-server" "--client-id" "emacs.eglot-dart")))))
+                     '((dart-mode) . ("fvm" "dart" "language-server" "--client-id" "emacs.eglot-dart"))))
+   (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'eglot-format-buffer -10 t))))
 
 (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
 

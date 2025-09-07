@@ -14,7 +14,7 @@
 (setq custom-file "~/.emacs.custom.el")
 (load-file custom-file)
 
-(setenv "PATH" (concat "/Users/flex99/.cabal/bin:" (getenv "PATH")))
+(setenv "PATH" (concat "/Users/felixvalentini/.cabal/bin:" (getenv "PATH")))
 
 ;; start package.el eith Emacs
 (require 'package)
@@ -309,7 +309,7 @@
             (lambda ()
               (add-hook 'before-save-hook #'eglot-format-buffer -10 t)))
   (add-to-list 'eglot-server-programs
-               '(haskell-mode . ("haskell-language-server" "--lsp")))
+               '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
   (define-key haskell-mode-map (kbd "C-c h") 'haskell-hoogle)
   (define-key haskell-mode-map (kbd "M-[") 'haskell-navigate-imports)
   (define-key haskell-mode-map (kbd "M-]") 'haskell-navigate-imports-return)
@@ -383,7 +383,7 @@
   :hook (
          (vue-mode . lsp)
          (python-mode . lsp)
-         (js-mode . lsp)
+         ;; (js-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :custom
@@ -395,15 +395,18 @@
 
 (use-package vue-mode
   :mode "\\.vue\\'"
-  :hook (vue-mode . prettier-js-mode)
+  :after tree-sitter
+  :hook ((vue-mode . prettier-js-mode) (vue-mode . lsp))
   :config
   (add-hook 'vue-mode-hook #'lsp)
   (add-hook 'vue-mode-hook 'prettier-js-mode)
   (setq prettier-js-args '("--parser vue"))
   ;; https://github.com/8uff3r/vue-ts-mode
   (add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
-  (require 'vue-ts-mode)
   (add-hook 'vue-mode-hook 'vue-ts-mode))
+
+(use-package prettier-js
+  :ensure t)
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -521,7 +524,7 @@
 
 (use-package typescript-mode
   :after tree-sitter
-  :hook ((typescript-mode . eglot-ensure))
+  :hook ((typescript-mode . lsp))
   :config
   ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
   ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
@@ -549,5 +552,28 @@
               (add-hook 'before-save-hook #'eglot-format-buffer -10 t))))
 
 (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
+
+(use-package web-mode
+  :ensure t
+  :mode ("\\.html?\\'" "\\.js\\'")
+  :hook ((web-mode . my/web-mode-setup))
+  :config
+  (setq web-mode-enable-auto-quoting nil)
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-hook 'js-mode-hook #'eglot-ensure)
+  (add-hook 'web-mode-hook #'eglot-ensure)
+  (with-eval-after-load 'eglot
+  (with-eval-after-load 'eglot
+  ;; JS and web-mode files -> use typescript-language-server
+  (add-to-list 'eglot-server-programs
+               '(js-mode . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               '(web-mode . ("vscode-html-language-server" "--stdio"))))))
+
+(use-package ox-moderncv
+    :load-path "/Users/felixvalentini/sources/org-cv/"
+    :init (require 'ox-altacv))
+
 
 ;;; init.el ends here

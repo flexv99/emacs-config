@@ -575,5 +575,11 @@
     :load-path "/Users/felixvalentini/sources/org-cv/"
     :init (require 'ox-altacv))
 
+(use-package direnv
+ :config
+ (direnv-mode))
+
+(use-package pg :vc (:url "https://github.com/emarsden/pg-el/"))
+(use-package pgmacs :vc (:url "https://github.com/emarsden/pgmacs/"))
 
 ;;; init.el ends here

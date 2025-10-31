@@ -376,45 +376,39 @@
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :hook (
-         (vue-mode . lsp)
-         (python-mode . lsp)
-         ;; (js-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :custom
-  (lsp-vetur-format-default-formatter-css "none")
-  (lsp-vetur-format-default-formatter-html "none")
-  (lsp-vetur-format-default-formatter-js "none")
-  (lsp-vetur-validation-template nil)
-  :commands lsp)
-
 (use-package vue-mode
   :mode "\\.vue\\'"
   :after tree-sitter
-  :hook ((vue-mode . prettier-js-mode) (vue-mode . lsp))
+  :hook (vue-mode . eglot-ensure))
+
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   `((vue-mode)
+     . ("node"
+        ,(expand-file-name "node_modules/@vue/language-server/bin/vue-language-server.js"
+                           (locate-dominating-file default-directory "package.json"))
+        "--stdio"
+        :initializationOptions
+        (:typescript (:tsdk "./node_modules/typescript/lib"))))))
+
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   `((typescrip-ts-mode)
+     . ("node"
+        ,(expand-file-name "node_modules/typescript-language-server/lib/cli.mjs"
+                           (locate-dominating-file default-directory "package.json"))
+        "--stdio"))))
+
+(use-package apheleia
+  :ensure t
   :config
-  (add-hook 'vue-mode-hook #'lsp)
-  (add-hook 'vue-mode-hook 'prettier-js-mode)
-  (setq prettier-js-args '("--parser vue"))
-  ;; https://github.com/8uff3r/vue-ts-mode
-  (add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
-  (add-hook 'vue-mode-hook 'vue-ts-mode))
-
-(use-package prettier-js
-  :ensure t)
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+  ;; Use project-local Prettier if available
+  (setf (alist-get 'prettier apheleia-formatters)
+        '("npx" "prettier" "--stdin-filepath" filepath))
+  (setf (alist-get 'vue-mode apheleia-mode-alist) '(prettier))
+  (add-hook 'vue-mode-hook #'apheleia-mode))
 
 (setq treesit-language-source-alist
       '((css "https://github.com/tree-sitter/tree-sitter-css")
@@ -434,6 +428,7 @@
 
 (setq major-mode-remap-alist
       '((yaml-mode . yaml-ts-mode)
+        ;; (vue-mode . vue-ts-mode)
         (js2-mode . js-ts-mode)
         (typescript-mode . typescript-ts-mode)
         (json-mode . json-ts-mode)
@@ -522,21 +517,6 @@
 (use-package nix-mode
   :mode "\\.nix\\'")
 
-(use-package typescript-mode
-  :after tree-sitter
-  :hook ((typescript-mode . lsp))
-  :config
-  ;; we choose this instead of tsx-mode so that eglot can automatically figure out language for server
-  ;; see https://github.com/joaotavora/eglot/issues/624 and https://github.com/joaotavora/eglot#handling-quirky-servers
-  (define-derived-mode typescriptreact-mode typescript-mode
-    "TypeScript TSX")
-
-  ;; use our derived mode for tsx files
-  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescriptreact-mode))
-  ;; by default, typescript-mode is mapped to the treesitter typescript parser
-  ;; use our derived mode to map both .tsx AND .ts -> typescriptreact-mode -> treesitter tsx
-  (add-to-list 'tree-sitter-major-mode-language-alist '(typescriptreact-mode . tsx)))
-
 (use-package apheleia
   :ensure t)
 
@@ -552,24 +532,6 @@
               (add-hook 'before-save-hook #'eglot-format-buffer -10 t))))
 
 (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
-
-(use-package web-mode
-  :ensure t
-  :mode ("\\.html?\\'" "\\.js\\'")
-  :hook ((web-mode . my/web-mode-setup))
-  :config
-  (setq web-mode-enable-auto-quoting nil)
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js-mode))
-  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-  (add-hook 'js-mode-hook #'eglot-ensure)
-  (add-hook 'web-mode-hook #'eglot-ensure)
-  (with-eval-after-load 'eglot
-  (with-eval-after-load 'eglot
-  ;; JS and web-mode files -> use typescript-language-server
-  (add-to-list 'eglot-server-programs
-               '(js-mode . ("typescript-language-server" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               '(web-mode . ("vscode-html-language-server" "--stdio"))))))
 
 (use-package ox-moderncv
     :load-path "/Users/felixvalentini/sources/org-cv/"

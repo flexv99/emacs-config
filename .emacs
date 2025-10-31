@@ -334,20 +334,6 @@
           (equal '(w3m-arrived-anchor) (get-text-property (point) 'face)))
       (w3m-view-this-url)))
 
-;; (add-to-list 'load-path "~/sources/haskell-ts-mode")
-;; (require 'haskell-ts-mode)
-
-;; (add-to-list 'treesit-language-source-alist
-;; 	     '(haskell . ("https://github.com/tree-sitter/tree-sitter-haskell" "master" "src")))
-
-;; (with-eval-after-load 'eglot (haskell-ts-setup-eglot))
-
-;; (use-package ormolu
-;;   :hook (haskell-ts-mode . ormolu-format-on-save-mode)
-;;   :bind
-;;   (:map haskell-mode-map
-;;         ("C-c r" . ormolu-format-buffer)))
-
 ;; ghcid
 ;; file: https://raw.githubusercontent.com/ndmitchell/ghcid/master/plugins/emacs/ghcid.el
 (add-to-list 'load-path "~/sources/ghcid/plugins/emacs")
@@ -376,30 +362,36 @@
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package vue-mode
-  :mode "\\.vue\\'"
-  :after tree-sitter
-  :hook (vue-mode . eglot-ensure))
+;; (use-package vue-mode
+;;   :mode "\\.vue\\'"
+;;   :after tree-sitter
+;;   :hook (vue-mode . eglot-ensure))
+(add-to-list 'load-path (concat user-emacs-directory "vue-ts-mode"))
+(require 'vue-ts-mode)
+
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-ts-mode))
+
+;; (with-eval-after-load 'eglot
+;;   (add-to-list
+;;    'eglot-server-programs
+;;    `((vue-ts-mode)
+;;      . ("node"
+;;         ,(expand-file-name "node_modules/@vue/language-server/bin/vue-language-server.js"
+;;                            (locate-dominating-file default-directory "package.json"))
+;;         "--stdio"
+;;         :initializationOptions
+;;         '(:vue (:hybridMode :json-false))))))
+;; (add-hook 'vue-ts-mode-hook 'eglot-ensure)
 
 (with-eval-after-load 'eglot
   (add-to-list
    'eglot-server-programs
-   `((vue-mode)
-     . ("node"
-        ,(expand-file-name "node_modules/@vue/language-server/bin/vue-language-server.js"
-                           (locate-dominating-file default-directory "package.json"))
-        "--stdio"
-        :initializationOptions
-        (:typescript (:tsdk "./node_modules/typescript/lib"))))))
-
-(with-eval-after-load 'eglot
-  (add-to-list
-   'eglot-server-programs
-   `((typescrip-ts-mode)
+   `((typescript-ts-mode)
      . ("node"
         ,(expand-file-name "node_modules/typescript-language-server/lib/cli.mjs"
                            (locate-dominating-file default-directory "package.json"))
         "--stdio"))))
+(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
 
 (use-package apheleia
   :ensure t
@@ -407,8 +399,8 @@
   ;; Use project-local Prettier if available
   (setf (alist-get 'prettier apheleia-formatters)
         '("npx" "prettier" "--stdin-filepath" filepath))
-  (setf (alist-get 'vue-mode apheleia-mode-alist) '(prettier))
-  (add-hook 'vue-mode-hook #'apheleia-mode))
+  (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(prettier))
+  (add-hook 'typescript-ts-mode #'apheleia-mode))
 
 (setq treesit-language-source-alist
       '((css "https://github.com/tree-sitter/tree-sitter-css")
@@ -428,7 +420,6 @@
 
 (setq major-mode-remap-alist
       '((yaml-mode . yaml-ts-mode)
-        ;; (vue-mode . vue-ts-mode)
         (js2-mode . js-ts-mode)
         (typescript-mode . typescript-ts-mode)
         (json-mode . json-ts-mode)
